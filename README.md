@@ -1,9 +1,9 @@
-
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planning Pro V8.6</title>
+    <title>Planning Pro V8.7</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -21,7 +21,7 @@
         .prenom { background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; display: inline-block; }
         .file-link { display: flex; align-items: center; background: #e0f2fe; border: 1px solid #7dd3fc; padding: 10px; border-radius: 8px; font-size: 0.85rem; color: #0369a1; font-weight: bold; margin-top: 10px; cursor: pointer; }
         .footer-btns { display: flex; gap: 5px; margin-top: 15px; flex-wrap: wrap; }
-        .btn-f { flex: 1; min-width: 80px; padding: 15px 5px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
+        .btn-f { flex: 1; min-width: 80px; padding: 12px 5px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; }
         .ok { background: var(--s); } .cam { background: #6366f1; } .pb { background: var(--d); } .admin-file { background: #475569; }
         .report-box { background: #fff1f2; border: 1px solid #fda4af; color: #9f1239; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; }
         input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
@@ -39,7 +39,7 @@
 <div id="docOverlay" class="overlay">
     <div style="margin-bottom:10px; display:flex; gap:10px;">
         <button onclick="closePopups()" style="background:red; color:white; border:none; padding:10px 20px; border-radius:8px;">FERMER</button>
-        <a id="downloadLink" href="" download style="background:var(--p); color:white; text-decoration:none; padding:10px 20px; border-radius:8px;">TELECHARGER</a>
+        <a id="downloadLink" href="" download style="background:var(--p); color:white; text-decoration:none; padding:10px 20px; border-radius:8px;">TÉLÉCHARGER</a>
     </div>
     <iframe id="fullDoc" src=""></iframe>
 </div>
@@ -68,7 +68,6 @@
         </label>
         <div id="fileStatus" style="font-size:0.7rem; margin-top:5px; color:#666;">Aucun fichier sélectionné</div>
     </div>
-
     <button onclick="ajouter()" style="background:var(--p); color:white; width:100%; border:none; padding:15px; border-radius:8px; font-weight:bold;">CRÉER LE CHANTIER</button>
 </div>
 
@@ -91,7 +90,6 @@
     const db = firebase.database();
     
     const NTFY_TOPIC = "Alerte_chantier"; 
-
     let currentMonday = getMonday(new Date());
     let activeId = null;
     let isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
@@ -108,11 +106,7 @@
         const file = document.getElementById('fDocInit').files[0];
         if(!file) return;
         const reader = new FileReader();
-        reader.onload = (e) => { 
-            tempFileData = e.target.result; 
-            tempFileName = file.name; 
-            document.getElementById('fileStatus').innerText = "✅ Prêt : " + file.name; 
-        };
+        reader.onload = (e) => { tempFileData = e.target.result; tempFileName = file.name; document.getElementById('fileStatus').innerText = "Prêt : " + file.name; };
         reader.readAsDataURL(file);
     }
 
@@ -138,12 +132,8 @@
             if(!list) return;
 
             let imgs = ""; if(t.photos) Object.keys(t.photos).forEach(k => imgs += `<img src="${t.photos[k]}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;margin:5px;cursor:pointer;" onclick="openPhoto('${t.id}','${k}')">`);
-            let docs = ""; if(t.files) Object.keys(t.files).forEach(k => docs += `<div class="file-link" onclick="openDoc('${t.id}','${k}')">📄 DOC : ${t.files[k].name}</div>`);
-            
-            let pbs = ""; 
-            if(t.reports) {
-                pbs = `<div class="report-box"><strong>RAPPORTS :</strong>` + Object.values(t.reports).map(r => `<div>- ${r}</div>`).join('') + `</div>`;
-            }
+            let docs = ""; if(t.files) Object.keys(t.files).forEach(k => docs += `<div class="file-link" onclick="openDoc('${t.id}','${k}')">📄 ${t.files[k].name}</div>`);
+            let pbs = (t.reports) ? `<div class="report-box"><strong>RAPPORTS :</strong>` + Object.values(t.reports).map(r => `<div>- ${r}</div>`).join('') + `</div>` : "";
 
             const card = document.createElement('div');
             card.className = `card ${t.status}`;
@@ -163,7 +153,7 @@
                     <button class="btn-f ok" onclick="setStatus('${t.id}', 'done', '${t.titre}')">FINI</button>
                     <button class="btn-f cam" onclick="triggerUpload('${t.id}', 'img')">PHOTO</button>
                     ${isAdmin ? `<button class="btn-f admin-file" onclick="triggerUpload('${t.id}', 'file')">DOC</button>` : ''}
-                    <button class="btn-f pb" onclick="addPb('${t.id}', '${t.titre}')">PROBLEME</button>
+                    <button class="btn-f pb" onclick="addPb('${t.id}', '${t.titre}')">PB</button>
                 </div>
                 ${isAdmin ? `<button onclick="delT('${t.id}')" style="color:red;border:none;background:none;font-size:0.6rem;margin-top:15px;cursor:pointer;">[SUPPRIMER]</button>` : ''}
             `;
@@ -172,37 +162,25 @@
     }
 
     function sendNotif(titre, msg) {
-        const corps = titre + "\n" + msg;
-        fetch('https://ntfy.sh/' + NTFY_TOPIC, {
-            method: 'POST',
-            body: corps,
-            headers: { 'Priority': '5' }
-        }).catch(e => console.log("Erreur notif"));
+        fetch('https://ntfy.sh/' + NTFY_TOPIC, { method: 'POST', body: titre + "\n" + msg, headers: { 'Priority': '5' } });
     }
 
-    function setStatus(id, s, t) { 
-        db.ref('chantiers/'+id).update({status:s}); 
-        if(s==='done') sendNotif("CHANTIER TERMINE", "Client: " + t); 
-    }
-    
-    function addPb(id, t) { 
-        let m = prompt("Quel est le probleme ?"); 
-        if(m) { 
-            let time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}); 
-            db.ref('chantiers/'+id+'/reports').push(time + " : " + m); 
-            db.ref('chantiers/'+id).update({status:'issue'}); 
-            sendNotif("ALERTE PROBLEME", t + " : " + m); 
-        } 
-    }
+    function setStatus(id, s, t) { db.ref('chantiers/'+id).update({status:s}); if(s==='done') sendNotif("CHANTIER TERMINE", "Le chantier " + t + " est fini."); }
+    function addPb(id, t) { let m = prompt("Quel est le problème ?"); if(m) { let time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}); db.ref('chantiers/'+id+'/reports').push(time + " : " + m); db.ref('chantiers/'+id).update({status:'issue'}); sendNotif("ALERTE PROBLEME", t + " : " + m); } }
     
     function openPhoto(id, k) { document.getElementById('fullPhoto').src = tousLesChantiers[id].photos[k]; document.getElementById('photoOverlay').style.display='flex'; }
-    function openDoc(id, k) { let f = tousLesChantiers[id].files[k]; document.getElementById('fullDoc').src = f.data; document.getElementById('downloadLink').href = f.data; document.getElementById('downloadLink').download = f.name; document.getElementById('docOverlay').style.display='flex'; }
+    function openDoc(id, k) { let f = tousLesChantiers[id].files[k]; document.getElementById('fullDoc').src = f.data; document.getElementById('downloadLink').href = f.data; document.getElementById('docOverlay').style.display='flex'; }
     function closePopups() { document.querySelectorAll('.overlay').forEach(o => o.style.display='none'); document.getElementById('fullDoc').src=""; }
-    function triggerUpload(id, type) { activeId = id; document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click(); }
+    
+    function triggerUpload(id, type) { 
+        activeId = id; 
+        document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click(); 
+    }
 
     function uploadFile(mode) {
-        const file = document.getElementById(mode === 'img' ? 'photoInput' : 'fileInput').files[0];
-        if(!file) return;
+        const fileInput = document.getElementById(mode === 'img' ? 'photoInput' : 'fileInput');
+        const file = fileInput.files[0];
+        if(!file || !activeId) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             if(mode === 'img') {
@@ -216,7 +194,10 @@
                     db.ref('chantiers/'+activeId+'/photos').push(canvas.toDataURL('image/jpeg', 0.6));
                 };
                 img.src = e.target.result;
-            } else { db.ref('chantiers/'+activeId+'/files').push({name:file.name, data:e.target.result}); }
+            } else { 
+                db.ref('chantiers/'+activeId+'/files').push({name:file.name, data:e.target.result}); 
+            }
+            fileInput.value = ""; // Reset
         };
         reader.readAsDataURL(file);
     }
@@ -224,15 +205,10 @@
     function ajouter() {
         const ref = db.ref('chantiers').push();
         const data = { id:ref.key, day:document.getElementById('fDay').value, prenom:document.getElementById('fPrenom').value, titre:document.getElementById('fTitre').value, adr:document.getElementById('fAdr').value, tel:document.getElementById('fTel').value, com:document.getElementById('fCom').value, weekID:getWeekID(currentMonday), status:'pending', ord:Date.now() };
-        
         ref.set(data).then(() => { 
-            if(tempFileData) {
-                db.ref('chantiers/' + data.id + '/files').push({ name: tempFileName, data: tempFileData });
-            }
-            ["fTitre","fAdr","fTel","fCom","fPrenom"].forEach(i => document.getElementById(i).value=""); 
-            document.getElementById('fDocInit').value = "";
-            document.getElementById('fileStatus').innerText = "Aucun fichier sélectionné";
-            tempFileData = null;
+            if(tempFileData) db.ref('chantiers/'+data.id+'/files').push({name:tempFileName, data:tempFileData});
+            ["fTitre","fAdr","fTel","fCom","fPrenom"].forEach(i => document.getElementById(i).value="");
+            document.getElementById('fileStatus').innerText = "Aucun fichier sélectionné"; tempFileData = null;
         });
     }
     function delT(id) { if(confirm("Supprimer ?")) db.ref('chantiers/'+id).remove(); }
