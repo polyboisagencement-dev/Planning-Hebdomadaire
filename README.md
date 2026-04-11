@@ -111,7 +111,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    const NTFY_TOPIC = "mon_planning_chantier_77"; 
+    const NTFY_TOPIC = "Alerte_chantier"; 
     let tempFileData = null;
     let tempFileName = "";
     let tousLesChantiers = {}; // Stockage en mémoire pour éviter de faire planter le mobile
