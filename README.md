@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PolyBois Agencement V9.7</title>
+    <title>PolyBois Agencement V9.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -39,6 +39,7 @@
         .btn-dl { padding: 12px 20px; background: var(--s); color: white; border: none; border-radius: 10px; font-weight: 800; text-decoration: none; font-size: 0.8rem; }
         .btn-close { padding: 12px 20px; background: var(--d); color: white; border: none; border-radius: 10px; font-weight: 800; font-size: 0.8rem; }
         .badge-note { background: #fefce8; border: 1px solid #fef08a; padding: 8px; border-radius: 8px; margin-top: 8px; font-size: 0.75rem; color: #854d0e; }
+        input, select { padding: 12px; border: 1px solid var(--border); border-radius: 10px; width: 100%; margin-bottom: 10px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -54,7 +55,7 @@
 <div id="docOverlay" class="overlay"><iframe id="fullDoc" style="width:95%; height:80vh; background:white; border-radius:12px;"></iframe><button onclick="closePopups()" class="btn-close" style="margin-top:10px;">FERMER</button></div>
 
 <header>
-    <img src="https://github.com/polyboisagencement-dev/-/blob/main/icon.png?raw=true" alt="Logo PolyBois" class="brand-logo">
+    <img src="https://via.placeholder.com/60" alt="Logo PolyBois" class="brand-logo">
     <h1 class="brand-name">PolyBois Agencement</h1>
     <div class="nav-ctn">
         <button onclick="changeWeek(-7)" class="btn-nav">◄ PRÉC.</button>
@@ -67,18 +68,29 @@
 <div id="adminArea">
     <strong id="formTitle" style="color:var(--p); display:block; margin-bottom:10px; text-align:center;">AJOUTER UN CHANTIER</strong>
     <input type="hidden" id="editId">
-    <input type="text" id="fPrenom" placeholder="Prénom ouvrier" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;">
-    <input type="text" id="fTitre" placeholder="Nom Client" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;">
-    <input type="text" id="fAdr" placeholder="Adresse" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;">
-    <input type="tel" id="fTel" placeholder="Téléphone" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;">
-    <input type="text" id="fCom" placeholder="Notes initiales" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;">
-    <select id="fDay" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;"><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select>
+    <input type="text" id="fPrenom" placeholder="Prénom ouvrier">
+    <input type="text" id="fTitre" placeholder="Nom Client">
+    <input type="text" id="fAdr" placeholder="Adresse">
+    <input type="tel" id="fTel" placeholder="Téléphone">
+    <input type="text" id="fCom" placeholder="Notes initiales">
+    
+    <div style="font-size: 0.75rem; color: var(--txt-light); margin-bottom: 5px;">Déplacer vers :</div>
+    <select id="fDay">
+        <option value="0">Lundi</option>
+        <option value="1">Mardi</option>
+        <option value="2">Mercredi</option>
+        <option value="3">Jeudi</option>
+        <option value="4">Vendredi</option>
+        <option value="5">Samedi</option>
+        <option value="6">Dimanche</option>
+    </select>
+
     <div id="fileZone" style="background:#f9fafb; padding:10px; border-radius:12px; margin-bottom:10px; border:1px dashed #ccc; text-align:center;">
         <label style="cursor:pointer; font-size:0.8rem; font-weight:800; color:var(--p);">📄 JOINDRE UN DOCUMENT <input type="file" id="fDocInit" style="display:none" onchange="previewFile()"></label>
         <div id="fileStatus" style="font-size:0.7rem; color:var(--txt-light);">Aucun fichier</div>
     </div>
-    <button id="btnSubmit" onclick="ajouter()" style="background:var(--p); color:white; width:100%; border:none; padding:15px; border-radius:10px; font-weight:800; cursor:pointer;">VALIDER AU PLANNING</button>
-    <button id="btnCancel" onclick="resetForm()" style="display:none; width:100%; margin-top:5px; padding:10px; border:none; border-radius:10px; font-weight:700; cursor:pointer;">Annuler modification</button>
+    <button id="btnSubmit" onclick="ajouter()" style="background:var(--p); color:white; width:100%; border:none; padding:15px; border-radius:10px; font-weight:800; cursor:pointer;">VALIDER</button>
+    <button id="btnCancel" onclick="resetForm()" style="display:none; width:100%; margin-top:5px; padding:10px; border:none; border-radius:10px; font-weight:700; cursor:pointer;">Annuler</button>
 </div>
 
 <div class="grid" id="board"></div>
@@ -164,29 +176,6 @@
         }
     }
 
-    function openPhoto(id, k) {
-        const t = tousLesChantiers[id];
-        const dataUrl = t.photos[k];
-        const fileName = `${t.titre.replace(/[^a-z0-req0-9]/gi, '_')}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.jpg`;
-        document.getElementById('fullPhoto').src = dataUrl;
-        document.getElementById('dlLink').href = dataUrl;
-        document.getElementById('dlLink').download = fileName;
-        document.getElementById('photoOverlay').style.display='flex';
-    }
-
-    function move(id, direction) {
-        const task = tousLesChantiers[id];
-        const sameDay = Object.values(tousLesChantiers).filter(t => t.day == task.day).sort((a,b) => (a.ord||0)-(b.ord||0));
-        const idx = sameDay.findIndex(t => t.id === id);
-        const newIdx = idx + direction;
-        if (newIdx >= 0 && newIdx < sameDay.length) {
-            const swapTask = sameDay[newIdx];
-            const tempOrd = task.ord || 0;
-            db.ref('chantiers/'+task.id).update({ ord: swapTask.ord || 0 });
-            db.ref('chantiers/'+swapTask.id).update({ ord: tempOrd });
-        }
-    }
-
     function startEdit(id) {
         const t = tousLesChantiers[id];
         document.getElementById('editId').value = id;
@@ -196,60 +185,53 @@
         document.getElementById('fTel').value = t.tel || "";
         document.getElementById('fCom').value = t.com || "";
         document.getElementById('fDay').value = t.day;
-        document.getElementById('formTitle').innerText = "MODIFIER LE CHANTIER";
-        document.getElementById('btnSubmit').innerText = "SAUVEGARDER LES MODIFS";
+        document.getElementById('formTitle').innerText = "MODIFIER / DÉPLACER LE CHANTIER";
+        document.getElementById('btnSubmit').innerText = "METTRE À JOUR";
         document.getElementById('btnCancel').style.display = "block";
         document.getElementById('fileZone').style.display = "none";
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function ajouter() {
+        const id = document.getElementById('editId').value;
+        const data = { 
+            prenom:document.getElementById('fPrenom').value, 
+            titre:document.getElementById('fTitre').value, 
+            adr:document.getElementById('fAdr').value, 
+            tel:document.getElementById('fTel').value, 
+            com:document.getElementById('fCom').value, 
+            day:document.getElementById('fDay').value,
+            weekID: getWeekID(currentMonday) // Met à jour la semaine si on a changé de semaine à l'affichage
+        };
+        if(id) { db.ref('chantiers/'+id).update(data).then(() => resetForm()); } 
+        else {
+            const ref = db.ref('chantiers').push();
+            data.id = ref.key; data.status = 'pending'; data.ord = Date.now();
+            ref.set(data).then(() => { if(tempFileData) db.ref('chantiers/'+data.id+'/files').push({name:tempFileName, data:tempFileData}); resetForm(); });
+        }
     }
 
     function resetForm() {
         document.getElementById('editId').value = "";
         ["fTitre","fAdr","fTel","fCom","fPrenom"].forEach(i => document.getElementById(i).value="");
         document.getElementById('formTitle').innerText = "AJOUTER UN CHANTIER";
-        document.getElementById('btnSubmit').innerText = "VALIDER AU PLANNING";
+        document.getElementById('btnSubmit').innerText = "VALIDER";
         document.getElementById('btnCancel').style.display = "none";
         document.getElementById('fileZone').style.display = "block";
         document.getElementById('fileStatus').innerText = "Aucun fichier";
         tempFileData = null;
     }
 
-    function ajouter() {
-        const id = document.getElementById('editId').value;
-        const data = { prenom:document.getElementById('fPrenom').value, titre:document.getElementById('fTitre').value, adr:document.getElementById('fAdr').value, tel:document.getElementById('fTel').value, com:document.getElementById('fCom').value, day:document.getElementById('fDay').value };
-        if(id) { db.ref('chantiers/'+id).update(data).then(() => resetForm()); } 
-        else {
-            const ref = db.ref('chantiers').push();
-            data.id = ref.key; data.weekID = getWeekID(currentMonday); data.status = 'pending'; data.ord = Date.now();
-            ref.set(data).then(() => { if(tempFileData) db.ref('chantiers/'+data.id+'/files').push({name:tempFileName, data:tempFileData}); resetForm(); });
-        }
-    }
-
+    // FONCTIONS RESTANTES (Identiques)
+    function openPhoto(id, k) { const t = tousLesChantiers[id]; const dataUrl = t.photos[k]; const fileName = `${t.titre.replace(/[^a-z0-req0-9]/gi, '_')}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.jpg`; document.getElementById('fullPhoto').src = dataUrl; document.getElementById('dlLink').href = dataUrl; document.getElementById('dlLink').download = fileName; document.getElementById('photoOverlay').style.display='flex'; }
+    function move(id, direction) { const task = tousLesChantiers[id]; const sameDay = Object.values(tousLesChantiers).filter(t => t.day == task.day).sort((a,b) => (a.ord||0)-(b.ord||0)); const idx = sameDay.findIndex(t => t.id === id); const newIdx = idx + direction; if (newIdx >= 0 && newIdx < sameDay.length) { const swapTask = sameDay[newIdx]; const tempOrd = task.ord || 0; db.ref('chantiers/'+task.id).update({ ord: swapTask.ord || 0 }); db.ref('chantiers/'+swapTask.id).update({ ord: tempOrd }); } }
     function sendNotif(titre, msg) { fetch('https://ntfy.sh/Alerte_chantier', { method: 'POST', body: titre + "\n" + msg }); }
     function setStatus(id, s, t) { db.ref('chantiers/'+id).update({status:s}); if(s==='done') sendNotif("CHANTIER TERMINE", t); }
     function addPb(id, t) { let m = prompt("Problème ?"); if(m) { let time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}); db.ref('chantiers/'+id+'/reports').push(time + " : " + m); db.ref('chantiers/'+id).update({status:'issue'}); sendNotif("ALERTE PB - " + t, m); } }
     function openDoc(id, k) { let f = tousLesChantiers[id].files[k]; document.getElementById('fullDoc').src = f.data; document.getElementById('docOverlay').style.display='flex'; }
     function closePopups() { document.querySelectorAll('.overlay').forEach(o => o.style.display='none'); document.getElementById('fullDoc').src=""; }
     function triggerUpload(id, type) { activeId = id; document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click(); }
-
-    function uploadFile(mode) {
-        const file = document.getElementById(mode === 'img' ? 'photoInput' : 'fileInput').files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            if(mode === 'img') {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas'); const MAX = 1200; let w = img.width, h = img.height;
-                    if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; }
-                    canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0,0,w,h);
-                    db.ref('chantiers/'+activeId+'/photos').push(canvas.toDataURL('image/jpeg', 0.8));
-                };
-                img.src = e.target.result;
-            } else { db.ref('chantiers/'+activeId+'/files').push({name:file.name, data:e.target.result}); }
-        };
-        reader.readAsDataURL(file);
-    }
+    function uploadFile(mode) { const file = document.getElementById(mode === 'img' ? 'photoInput' : 'fileInput').files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { if(mode === 'img') { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 1200; let w = img.width, h = img.height; if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0,0,w,h); db.ref('chantiers/'+activeId+'/photos').push(canvas.toDataURL('image/jpeg', 0.8)); }; img.src = e.target.result; } else { db.ref('chantiers/'+activeId+'/files').push({name:file.name, data:e.target.result}); } }; reader.readAsDataURL(file); }
     function delT(id) { if(confirm("Supprimer ?")) db.ref('chantiers/'+id).remove(); }
     updateCalendar();
 </script>
