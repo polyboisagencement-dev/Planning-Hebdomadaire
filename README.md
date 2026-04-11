@@ -1,9 +1,9 @@
-
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planning Pro V8.2</title>
+    <title>Planning Pro V8.5</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -14,7 +14,7 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
         .col { background: #e2e8f0; border-radius: 12px; padding: 10px; min-height: 200px; margin-bottom:10px; }
         .day-h { text-align: center; font-weight: bold; color: #1e40af; padding: 10px; text-transform: uppercase; }
-        .card { background: white; padding: 15px; border-radius: 12px; margin-top: 10px; border-left: 6px solid #94a3b8; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
+        .card { background: white; padding: 15px; border-radius: 12px; margin-top: 10px; border-left: 6px solid #94a3b8; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .card.done { border-left-color: var(--s); background: #f0fdf4; }
         .card.issue { border-left-color: var(--d); background: #fef2f2; }
         .title { font-weight: 800; font-size: 1.1rem; display: block; margin: 5px 0; }
@@ -23,7 +23,7 @@
         .footer-btns { display: flex; gap: 5px; margin-top: 15px; flex-wrap: wrap; }
         .btn-f { flex: 1; min-width: 80px; padding: 15px 5px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
         .ok { background: var(--s); } .cam { background: #6366f1; } .pb { background: var(--d); } .admin-file { background: #475569; }
-        .report-box { background: #fff1f2; border: 1px solid #fda4af; color: #9f1239; padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; font-weight: bold; }
+        .report-box { background: #fff1f2; border: 1px solid #fda4af; color: #9f1239; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; }
         input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
         .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; padding: 10px; }
         #docOverlay iframe { width: 100%; max-width: 800px; height: 80vh; background: white; border-radius: 8px; }
@@ -32,14 +32,14 @@
 <body>
 
 <div id="photoOverlay" class="overlay" onclick="closePopups()">
-    <button style="position:absolute; top:20px; right:20px; padding:15px; background:red; color:white; border:none; border-radius:8px; font-weight:bold;">FERMER</button>
     <img id="fullPhoto" src="" style="max-width:95%; max-height:80vh; border:3px solid white; border-radius:8px;">
+    <button style="margin-top:20px; padding:10px 20px; background:red; color:white; border:none; border-radius:8px;">FERMER</button>
 </div>
 
 <div id="docOverlay" class="overlay">
     <div style="margin-bottom:10px; display:flex; gap:10px;">
-        <button onclick="closePopups()" style="background:red; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold;">FERMER</button>
-        <a id="downloadLink" href="" download class="btn-dl" style="background:var(--p); color:white; text-decoration:none; padding:10px 20px; border-radius:8px; font-weight:bold;">TÉLÉCHARGER</a>
+        <button onclick="closePopups()" style="background:red; color:white; border:none; padding:10px 20px; border-radius:8px;">FERMER</button>
+        <a id="downloadLink" href="" download style="background:var(--p); color:white; text-decoration:none; padding:10px 20px; border-radius:8px;">TELECHARGER</a>
     </div>
     <iframe id="fullDoc" src=""></iframe>
 </div>
@@ -47,9 +47,9 @@
 <header>
     <h2 id="weekRange">Chargement...</h2>
     <div style="display:flex; justify-content: center; gap:10px;">
-        <button onclick="changeWeek(-7)" style="padding:10px 20px; border-radius:8px; border:none; background:rgba(255,255,255,0.2); color:white; font-weight:bold;">◄</button>
+        <button onclick="changeWeek(-7)" style="padding:10px 20px; border-radius:8px; border:none; background:rgba(255,255,255,0.2); color:white;">◄</button>
         <button onclick="goToday()" style="padding:10px 20px; border-radius:8px; border:none; background:white; color:var(--p); font-weight:bold;">AUJOURD'HUI</button>
-        <button onclick="changeWeek(7)" style="padding:10px 20px; border-radius:8px; border:none; background:rgba(255,255,255,0.2); color:white; font-weight:bold;">►</button>
+        <button onclick="changeWeek(7)" style="padding:10px 20px; border-radius:8px; border:none; background:rgba(255,255,255,0.2); color:white;">►</button>
     </div>
 </header>
 
@@ -61,12 +61,6 @@
     <input type="tel" id="fTel" placeholder="Téléphone">
     <input type="text" id="fCom" placeholder="Notes / Infos">
     <select id="fDay"><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select>
-    <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:10px; border:1px dashed var(--p); text-align:center;">
-        <label style="cursor:pointer; font-size:0.8rem; font-weight:bold; color:var(--p);">📁 JOINDRE UN FICHIER (PDF, PLAN)
-            <input type="file" id="fDocInit" style="display:none" onchange="previewFile()">
-        </label>
-        <div id="fileStatus" style="font-size:0.7rem; margin-top:5px; color:#666;">Aucun fichier</div>
-    </div>
     <button onclick="ajouter()" style="background:var(--p); color:white; width:100%; border:none; padding:15px; border-radius:8px; font-weight:bold;">CRÉER LE CHANTIER</button>
 </div>
 
@@ -89,10 +83,11 @@
     const db = firebase.database();
     
     const NTFY_TOPIC = "Alerte_chantier"; 
+
     let currentMonday = getMonday(new Date());
     let activeId = null;
     let isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
-    let tempFileData = null; let tempFileName = ""; let tousLesChantiers = {};
+    let tousLesChantiers = {};
 
     if (isAdmin) document.getElementById('adminArea').style.display = 'block';
 
@@ -100,14 +95,6 @@
     function getWeekID(date) { let d = new Date(date); d.setHours(0,0,0,0); d.setDate(d.getDate() + 4 - (d.getDay() || 7)); return d.getFullYear() + "-W" + Math.ceil((((d - new Date(d.getFullYear(),0,1)) / 86400000) + 1) / 7); }
     function changeWeek(days) { currentMonday.setDate(currentMonday.getDate() + days); updateCalendar(); }
     function goToday() { currentMonday = getMonday(new Date()); updateCalendar(); }
-
-    function previewFile() {
-        const file = document.getElementById('fDocInit').files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => { tempFileData = e.target.result; tempFileName = file.name; document.getElementById('fileStatus').innerText = "✅ Prêt : " + file.name; };
-        reader.readAsDataURL(file);
-    }
 
     function updateCalendar() {
         const jours = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
@@ -131,12 +118,11 @@
             if(!list) return;
 
             let imgs = ""; if(t.photos) Object.keys(t.photos).forEach(k => imgs += `<img src="${t.photos[k]}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;margin:5px;cursor:pointer;" onclick="openPhoto('${t.id}','${k}')">`);
-            let docs = ""; if(t.files) Object.keys(t.files).forEach(k => docs += `<div class="file-link" onclick="openDoc('${t.id}','${k}')">📄 ${t.files[k].name}</div>`);
+            let docs = ""; if(t.files) Object.keys(t.files).forEach(k => docs += `<div class="file-link" onclick="openDoc('${t.id}','${k}')">DOC : ${t.files[k].name}</div>`);
             
-            // AFFICHAGE DES RAPPORTS DE PROBLEMES (CORRIGÉ)
             let pbs = ""; 
             if(t.reports) {
-                pbs = `<div class="report-box">` + Object.values(t.reports).map(r => `<div>⚠️ ${r}</div>`).join('') + `</div>`;
+                pbs = `<div class="report-box"><strong>RAPPORTS :</strong>` + Object.values(t.reports).map(r => `<div>- ${r}</div>`).join('') + `</div>`;
             }
 
             const card = document.createElement('div');
@@ -154,10 +140,10 @@
                 <div>${docs}</div>
                 ${pbs}
                 <div class="footer-btns">
-                    <button class="btn-f ok" onclick="setStatus('${t.id}', 'done', '${t.titre}')">FINI ✅</button>
-                    <button class="btn-f cam" onclick="triggerUpload('${t.id}', 'img')">PHOTO 📸</button>
-                    ${isAdmin ? `<button class="btn-f admin-file" onclick="triggerUpload('${t.id}', 'file')">DOC 📂</button>` : ''}
-                    <button class="btn-f pb" onclick="addPb('${t.id}', '${t.titre}')">PB ❌</button>
+                    <button class="btn-f ok" onclick="setStatus('${t.id}', 'done', '${t.titre}')">FINI</button>
+                    <button class="btn-f cam" onclick="triggerUpload('${t.id}', 'img')">PHOTO</button>
+                    ${isAdmin ? `<button class="btn-f admin-file" onclick="triggerUpload('${t.id}', 'file')">DOC</button>` : ''}
+                    <button class="btn-f pb" onclick="addPb('${t.id}', '${t.titre}')">PROBLEME</button>
                 </div>
                 ${isAdmin ? `<button onclick="delT('${t.id}')" style="color:red;border:none;background:none;font-size:0.6rem;margin-top:15px;cursor:pointer;">[SUPPRIMER]</button>` : ''}
             `;
@@ -165,17 +151,32 @@
         });
     }
 
+    // NOUVELLE FONCTION D'ENVOI IDENTIQUE AU TEST MANUEL
     function sendNotif(titre, msg) {
-        alert("Envoi de l'alerte au patron...");
-        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { 
-            method: 'POST', 
-            body: msg, 
-            headers: { 'Title': titre, 'Priority': '5', 'Tags': 'warning,construction' } 
-        }).then(() => console.log("Notif envoyée")).catch(e => alert("Erreur notif: " + e));
+        const corps = titre + "\n" + msg;
+        fetch('https://ntfy.sh/' + NTFY_TOPIC, {
+            method: 'POST',
+            body: corps,
+            headers: {
+                'Priority': '5'
+            }
+        }).catch(e => console.log("Erreur silencieuse notif"));
     }
 
-    function setStatus(id, s, t) { db.ref('chantiers/'+id).update({status:s}); if(s==='done') sendNotif("CHANTIER FINI ✅", "Le chantier "+t+" est terminé."); }
-    function addPb(id, t) { let m = prompt("Quel est le problème ?"); if(m) { let time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}); db.ref('chantiers/'+id+'/reports').push(time+" : "+m); db.ref('chantiers/'+id).update({status:'issue'}); sendNotif("⚠️ PROBLÈME", t+" : "+m); } }
+    function setStatus(id, s, t) { 
+        db.ref('chantiers/'+id).update({status:s}); 
+        if(s==='done') sendNotif("CHANTIER TERMINE", "Client: " + t); 
+    }
+    
+    function addPb(id, t) { 
+        let m = prompt("Quel est le probleme ?"); 
+        if(m) { 
+            let time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}); 
+            db.ref('chantiers/'+id+'/reports').push(time + " : " + m); 
+            db.ref('chantiers/'+id).update({status:'issue'}); 
+            sendNotif("ALERTE PROBLEME", t + " : " + m); 
+        } 
+    }
     
     function openPhoto(id, k) { document.getElementById('fullPhoto').src = tousLesChantiers[id].photos[k]; document.getElementById('photoOverlay').style.display='flex'; }
     function openDoc(id, k) { let f = tousLesChantiers[id].files[k]; document.getElementById('fullDoc').src = f.data; document.getElementById('downloadLink').href = f.data; document.getElementById('downloadLink').download = f.name; document.getElementById('docOverlay').style.display='flex'; }
@@ -190,10 +191,11 @@
             if(mode === 'img') {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                    const canvas = document.createElement('canvas');
                     const MAX = 800; let w = img.width, h = img.height;
                     if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; }
-                    canvas.width = w; canvas.height = h; ctx.drawImage(img, 0,0,w,h);
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0,0,w,h);
                     db.ref('chantiers/'+activeId+'/photos').push(canvas.toDataURL('image/jpeg', 0.6));
                 };
                 img.src = e.target.result;
@@ -205,7 +207,7 @@
     function ajouter() {
         const ref = db.ref('chantiers').push();
         const data = { id:ref.key, day:document.getElementById('fDay').value, prenom:document.getElementById('fPrenom').value, titre:document.getElementById('fTitre').value, adr:document.getElementById('fAdr').value, tel:document.getElementById('fTel').value, com:document.getElementById('fCom').value, weekID:getWeekID(currentMonday), status:'pending', ord:Date.now() };
-        ref.set(data).then(() => { if(tempFileData) db.ref('chantiers/'+data.id+'/files').push({name:tempFileName, data:tempFileData}); ["fTitre","fAdr","fTel","fCom","fPrenom"].forEach(i => document.getElementById(i).value=""); document.getElementById('fileStatus').innerText="Aucun fichier"; tempFileData=null; });
+        ref.set(data).then(() => { ["fTitre","fAdr","fTel","fCom","fPrenom"].forEach(i => document.getElementById(i).value=""); });
     }
     function delT(id) { if(confirm("Supprimer ?")) db.ref('chantiers/'+id).remove(); }
     updateCalendar();
