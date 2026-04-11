@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planning Pro V8.5</title>
+    <title>Planning Pro V8.6</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -61,6 +61,14 @@
     <input type="tel" id="fTel" placeholder="Téléphone">
     <input type="text" id="fCom" placeholder="Notes / Infos">
     <select id="fDay"><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select>
+    
+    <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:10px; border:1px dashed var(--p); text-align:center;">
+        <label style="cursor:pointer; font-size:0.8rem; font-weight:bold; color:var(--p);">📁 JOINDRE UN FICHIER (PDF, PLAN)
+            <input type="file" id="fDocInit" style="display:none" onchange="previewFile()">
+        </label>
+        <div id="fileStatus" style="font-size:0.7rem; margin-top:5px; color:#666;">Aucun fichier sélectionné</div>
+    </div>
+
     <button onclick="ajouter()" style="background:var(--p); color:white; width:100%; border:none; padding:15px; border-radius:8px; font-weight:bold;">CRÉER LE CHANTIER</button>
 </div>
 
@@ -87,7 +95,7 @@
     let currentMonday = getMonday(new Date());
     let activeId = null;
     let isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
-    let tousLesChantiers = {};
+    let tempFileData = null; let tempFileName = ""; let tousLesChantiers = {};
 
     if (isAdmin) document.getElementById('adminArea').style.display = 'block';
 
@@ -95,6 +103,18 @@
     function getWeekID(date) { let d = new Date(date); d.setHours(0,0,0,0); d.setDate(d.getDate() + 4 - (d.getDay() || 7)); return d.getFullYear() + "-W" + Math.ceil((((d - new Date(d.getFullYear(),0,1)) / 86400000) + 1) / 7); }
     function changeWeek(days) { currentMonday.setDate(currentMonday.getDate() + days); updateCalendar(); }
     function goToday() { currentMonday = getMonday(new Date()); updateCalendar(); }
+
+    function previewFile() {
+        const file = document.getElementById('fDocInit').files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => { 
+            tempFileData = e.target.result; 
+            tempFileName = file.name; 
+            document.getElementById('fileStatus').innerText = "✅ Prêt : " + file.name; 
+        };
+        reader.readAsDataURL(file);
+    }
 
     function updateCalendar() {
         const jours = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
@@ -118,7 +138,7 @@
             if(!list) return;
 
             let imgs = ""; if(t.photos) Object.keys(t.photos).forEach(k => imgs += `<img src="${t.photos[k]}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;margin:5px;cursor:pointer;" onclick="openPhoto('${t.id}','${k}')">`);
-            let docs = ""; if(t.files) Object.keys(t.files).forEach(k => docs += `<div class="file-link" onclick="openDoc('${t.id}','${k}')">DOC : ${t.files[k].name}</div>`);
+            let docs = ""; if(t.files) Object.keys(t.files).forEach(k => docs += `<div class="file-link" onclick="openDoc('${t.id}','${k}')">📄 DOC : ${t.files[k].name}</div>`);
             
             let pbs = ""; 
             if(t.reports) {
@@ -151,16 +171,13 @@
         });
     }
 
-    // NOUVELLE FONCTION D'ENVOI IDENTIQUE AU TEST MANUEL
     function sendNotif(titre, msg) {
         const corps = titre + "\n" + msg;
         fetch('https://ntfy.sh/' + NTFY_TOPIC, {
             method: 'POST',
             body: corps,
-            headers: {
-                'Priority': '5'
-            }
-        }).catch(e => console.log("Erreur silencieuse notif"));
+            headers: { 'Priority': '5' }
+        }).catch(e => console.log("Erreur notif"));
     }
 
     function setStatus(id, s, t) { 
@@ -207,7 +224,16 @@
     function ajouter() {
         const ref = db.ref('chantiers').push();
         const data = { id:ref.key, day:document.getElementById('fDay').value, prenom:document.getElementById('fPrenom').value, titre:document.getElementById('fTitre').value, adr:document.getElementById('fAdr').value, tel:document.getElementById('fTel').value, com:document.getElementById('fCom').value, weekID:getWeekID(currentMonday), status:'pending', ord:Date.now() };
-        ref.set(data).then(() => { ["fTitre","fAdr","fTel","fCom","fPrenom"].forEach(i => document.getElementById(i).value=""); });
+        
+        ref.set(data).then(() => { 
+            if(tempFileData) {
+                db.ref('chantiers/' + data.id + '/files').push({ name: tempFileName, data: tempFileData });
+            }
+            ["fTitre","fAdr","fTel","fCom","fPrenom"].forEach(i => document.getElementById(i).value=""); 
+            document.getElementById('fDocInit').value = "";
+            document.getElementById('fileStatus').innerText = "Aucun fichier sélectionné";
+            tempFileData = null;
+        });
     }
     function delT(id) { if(confirm("Supprimer ?")) db.ref('chantiers/'+id).remove(); }
     updateCalendar();
