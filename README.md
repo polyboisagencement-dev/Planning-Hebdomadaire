@@ -1,9 +1,9 @@
-
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planning Pro V8</title>
+    <title>Planning Pro V8.1</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -111,10 +111,12 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
+    // NOM DU CANAL NTFY CORRIGÉ
     const NTFY_TOPIC = "Alerte_chantier"; 
+
     let tempFileData = null;
     let tempFileName = "";
-    let tousLesChantiers = {}; // Stockage en mémoire pour éviter de faire planter le mobile
+    let tousLesChantiers = {};
 
     let currentMonday = getMonday(new Date());
     let activeId = null;
@@ -175,7 +177,6 @@
             const list = document.getElementById('list-' + t.day);
             if(!list) return;
 
-            // Affichage Photos (Optimisé avec appel à l'ID en mémoire)
             let imgs = "";
             if(t.photos) {
                 Object.keys(t.photos).forEach(key => {
@@ -183,7 +184,6 @@
                 });
             }
 
-            // Affichage Fichiers (Optimisé pour Pop-up)
             let docs = "";
             if(t.files) {
                 Object.keys(t.files).forEach(key => {
@@ -216,7 +216,6 @@
         });
     }
 
-    // FONCTIONS D'OUVERTURE POP-UP
     function openPhoto(chantierId, photoKey) {
         const src = tousLesChantiers[chantierId].photos[photoKey];
         document.getElementById('fullPhoto').src = src;
@@ -234,7 +233,7 @@
     function closePopups() {
         document.getElementById('photoOverlay').style.display = 'none';
         document.getElementById('docOverlay').style.display = 'none';
-        document.getElementById('fullDoc').src = ""; // Vide l'iframe pour éviter la lecture en fond
+        document.getElementById('fullDoc').src = ""; 
     }
 
     function triggerUpload(id, type) { activeId = id; document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click(); }
@@ -265,7 +264,6 @@
         reader.readAsDataURL(file);
     }
 
-    // SYSTEME DE NOTIFICATION NTFY FORCÉ
     function sendNotif(titre, msg) {
         fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { 
             method: 'POST', 
