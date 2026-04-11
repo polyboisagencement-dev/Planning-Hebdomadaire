@@ -1,9 +1,8 @@
-<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PolyBois Planning V9.6</title>
+    <title>PolyBois Agencement V9.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -12,8 +11,7 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--txt); }
         header { background: #1e3a8a; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: white; padding: 25px 15px; border-radius: 16px; margin-bottom: 20px; text-align: center; }
         .brand-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid white; background: white; margin-bottom: 10px; }
-        .brand-name { margin: 0; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; }
-        .planning-title { margin: 2px 0 15px 0; font-size: 0.85rem; font-weight: 800; letter-spacing: 1px; opacity: 0.9; text-transform: uppercase; }
+        .brand-name { margin: 0; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; }
         .nav-ctn { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
         .btn-nav { padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
         .btn-nav.today { background: white; color: #1e3a8a; border: none; }
@@ -56,9 +54,8 @@
 <div id="docOverlay" class="overlay"><iframe id="fullDoc" style="width:95%; height:80vh; background:white; border-radius:12px;"></iframe><button onclick="closePopups()" class="btn-close" style="margin-top:10px;">FERMER</button></div>
 
 <header>
-    <img src="https://github.com/polyboisagencement-dev/Planning-Hebdomadaire/blob/main/icon.png?raw=true" alt="Logo PolyBois" class="brand-logo">
+    <img src="https://via.placeholder.com/60" alt="Logo PolyBois" class="brand-logo">
     <h1 class="brand-name">PolyBois Agencement</h1>
-    <div class="planning-title">PLANNING CHANTIER HEBDOMADAIRE</div>
     <div class="nav-ctn">
         <button onclick="changeWeek(-7)" class="btn-nav">◄ PRÉC.</button>
         <button onclick="goToday()" class="btn-nav today">AUJOURD'HUI</button>
