@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planning Pro Admin v5</title>
+    <title>Planning Pro V6</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -11,29 +11,26 @@
         body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         header { background: #1e40af; color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
         
-        /* STYLE ADMIN */
         #adminArea { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 3px solid var(--p); display: none; }
-        .admin-tag { background: var(--p); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-bottom: 10px; display: inline-block; }
         
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
         .col { background: #e2e8f0; border-radius: 12px; padding: 10px; min-height: 200px; }
-        .day-h { text-align: center; font-weight: bold; color: #1e40af; padding: 10px; text-transform: uppercase; }
+        .day-h { text-align: center; font-weight: bold; color: #1e40af; padding: 10px; text-transform: uppercase; border-bottom: 2px solid #cbd5e1; }
 
         .card { background: white; padding: 15px; border-radius: 12px; margin-top: 10px; border-left: 6px solid #94a3b8; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .card.done { border-left-color: var(--s); background: #f0fdf4; }
         .card.issue { border-left-color: var(--d); background: #fef2f2; }
         
         .title { font-weight: 800; font-size: 1.1rem; display: block; margin: 5px 0; }
-        .prenom { background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; }
+        .prenom { background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; display: inline-block; }
         
-        /* BOUTONS FICHIERS */
-        .file-link { display: flex; align-items: center; background: #e0f2fe; border: 1px solid #7dd3fc; padding: 8px; border-radius: 6px; font-size: 0.8rem; text-decoration: none; color: #0369a1; font-weight: bold; margin-top: 8px; }
+        .file-link { display: flex; align-items: center; background: #e0f2fe; border: 1px solid #7dd3fc; padding: 10px; border-radius: 8px; font-size: 0.85rem; text-decoration: none; color: #0369a1; font-weight: bold; margin-top: 10px; }
         
         .footer-btns { display: flex; gap: 5px; margin-top: 15px; flex-wrap: wrap; }
-        .btn-f { flex: 1; min-width: 80px; padding: 12px 5px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
+        .btn-f { flex: 1; min-width: 80px; padding: 15px 5px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
         .ok { background: var(--s); } .cam { background: #6366f1; } .pb { background: var(--d); } .admin-file { background: #475569; }
 
-        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; font-size: 1rem; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
         #photoOverlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; }
         #photoOverlay img { max-width: 95%; max-height: 85%; border: 3px solid white; }
     </style>
@@ -45,27 +42,27 @@
 <header>
     <h2 id="weekRange">Chargement...</h2>
     <div style="display:flex; justify-content: center; gap:10px;">
-        <button class="btn-nav" style="padding:10px; border-radius:8px; border:none; cursor:pointer;" onclick="changeWeek(-7)">◄</button>
-        <button class="btn-nav" style="padding:10px; border-radius:8px; border:none; cursor:pointer;" onclick="goToday()">AUJOURD'HUI</button>
-        <button class="btn-nav" style="padding:10px; border-radius:8px; border:none; cursor:pointer;" onclick="changeWeek(7)">►</button>
+        <button class="btn-nav" style="padding:10px; border-radius:8px; border:none; cursor:pointer;" onclick="changeWeek(-7)">◄ Précédent</button>
+        <button class="btn-nav" style="padding:10px; border-radius:8px; border:none; cursor:pointer;" onclick="goToday()">Aujourd'hui</button>
+        <button class="btn-nav" style="padding:10px; border-radius:8px; border:none; cursor:pointer;" onclick="changeWeek(7)">Suivant ►</button>
     </div>
 </header>
 
 <div id="adminArea">
-    <span class="admin-tag">MODE ADMINISTRATEUR</span>
+    <strong style="color:var(--p);">MODE ADMIN : AJOUTER UN CHANTIER</strong>
     <input type="text" id="fPrenom" placeholder="Prénom de l'ouvrier">
     <input type="text" id="fTitre" placeholder="Nom du Client / Chantier">
     <input type="text" id="fAdr" placeholder="Adresse complète">
     <input type="tel" id="fTel" placeholder="Téléphone">
-    <input type="text" id="fCom" placeholder="Commentaires / Infos">
+    <input type="text" id="fCom" placeholder="Notes (Code portail, etc.)">
     <select id="fDay"><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select>
-    <button style="background:var(--p); color:white; width:100%; border:none; padding:15px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="ajouter()">+ CRÉER LA TACHE</button>
+    <button style="background:var(--p); color:white; width:100%; border:none; padding:15px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="ajouter()">AJOUTER AU PLANNING</button>
 </div>
 
 <div class="grid" id="board"></div>
 
-<input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="upload('img')">
-<input type="file" id="fileInput" style="display:none" onchange="upload('doc')">
+<input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="uploadFile('img')">
+<input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx" style="display:none" onchange="uploadFile('doc')">
 
 <script>
     const firebaseConfig = {
@@ -79,6 +76,9 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    
+    // NOM DU CANAL DE NOTIFICATION
+    const NTFY_TOPIC = "mon_planning_chantier_77"; 
 
     let currentMonday = getMonday(new Date());
     let activeId = null;
@@ -121,49 +121,53 @@
             if(!list) return;
 
             let imgs = "";
-            if(t.photos) Object.values(t.photos).forEach(src => imgs += `<img src="${src}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;margin:5px;cursor:pointer;" onclick="zoom('${src}')">`);
+            if(t.photos) Object.values(t.photos).forEach(src => imgs += `<img src="${src}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;margin:5px;cursor:pointer;border:1px solid #ddd;" onclick="zoom('${src}')">`);
 
             let docs = "";
-            if(t.files) Object.values(t.files).forEach(f => docs += `<a href="${f.data}" target="_blank" class="file-link">📄 ${f.name}</a>`);
+            if(t.files) Object.values(t.files).forEach(f => docs += `<a href="${f.data}" target="_blank" class="file-link">📄 DOCUMENT : ${f.name}</a>`);
+
+            let pbs = "";
+            if(t.reports) pbs = `<div style="background:#fee2e2;color:#b91c1c;padding:10px;border-radius:8px;margin-top:10px;font-size:0.8rem;">` + Object.values(t.reports).map(r => `<div>⚠️ ${r}</div>`).join('') + `</div>`;
 
             const card = document.createElement('div');
             card.className = `card ${t.status}`;
             card.innerHTML = `
-                <span class="prenom">${t.prenom || 'N/A'}</span>
+                <span class="prenom">${t.prenom || 'Ouvrier'}</span>
                 <span class="title">${t.titre}</span>
-                <span style="font-size:0.8rem; color:#666;">📍 ${t.adr || ''}</span>
+                <span style="font-size:0.85rem; color:#666;">📍 ${t.adr || ''}</span>
                 <div style="display:flex; gap:5px; margin-top:10px;">
-                    <a href="waze://?q=${encodeURIComponent(t.adr)}&navigate=yes" style="flex:1;background:#00d4ff;color:white;text-decoration:none;text-align:center;padding:8px;border-radius:4px;font-size:0.7rem;font-weight:bold;">WAZE</a>
-                    <a href="tel:${t.tel}" style="flex:1;background:#ff9f43;color:white;text-decoration:none;text-align:center;padding:8px;border-radius:4px;font-size:0.7rem;font-weight:bold;">APPELER</a>
+                    <a href="waze://?q=${encodeURIComponent(t.adr)}&navigate=yes" style="flex:1;background:#00d4ff;color:white;text-decoration:none;text-align:center;padding:12px;border-radius:8px;font-size:0.75rem;font-weight:bold;">WAZE</a>
+                    <a href="tel:${t.tel}" style="flex:1;background:#ff9f43;color:white;text-decoration:none;text-align:center;padding:12px;border-radius:8px;font-size:0.75rem;font-weight:bold;">APPEL</a>
                 </div>
-                ${t.com ? `<div style="margin-top:10px;font-size:0.75rem;background:#f1f5f9;padding:8px;border-radius:6px;">${t.com}</div>` : ''}
+                ${t.com ? `<div style="margin-top:10px;font-size:0.8rem;background:#f1f5f9;padding:10px;border-radius:8px;border:1px solid #eee;">${t.com}</div>` : ''}
                 <div style="margin-top:10px;">${imgs}</div>
                 <div>${docs}</div>
+                ${pbs}
                 <div class="footer-btns">
-                    <button class="btn-f ok" onclick="setStatus('${t.id}', 'done')">FINI</button>
-                    <button class="btn-f cam" onclick="openUpload('${t.id}', 'img')">PHOTO</button>
-                    ${isAdmin ? `<button class="btn-f admin-file" onclick="openUpload('${t.id}', 'file')">FICHIER</button>` : ''}
-                    <button class="btn-f pb" onclick="addPb('${t.id}')">PB</button>
+                    <button class="btn-f ok" onclick="setStatus('${t.id}', 'done', '${t.titre}')">FINI ✅</button>
+                    <button class="btn-f cam" onclick="triggerUpload('${t.id}', 'img')">PHOTO 📸</button>
+                    ${isAdmin ? `<button class="btn-f admin-file" onclick="triggerUpload('${t.id}', 'file')">FICHIER 📂</button>` : ''}
+                    <button class="btn-f pb" onclick="addPb('${t.id}', '${t.titre}')">PB ❌</button>
                 </div>
-                ${isAdmin ? `<button onclick="delT('${t.id}')" style="color:red;border:none;background:none;font-size:0.6rem;margin-top:10px;cursor:pointer;">SUPPRIMER TACHE</button>` : ''}
+                ${isAdmin ? `<button onclick="delT('${t.id}')" style="color:red;border:none;background:none;font-size:0.6rem;margin-top:15px;cursor:pointer;font-weight:bold;">[SUPPRIMER CHANTIER]</button>` : ''}
             `;
             list.appendChild(card);
         });
     }
 
-    function openUpload(id, type) {
+    function triggerUpload(id, type) {
         activeId = id;
         document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click();
     }
 
-    function upload(mode) {
+    function uploadFile(mode) {
         const input = document.getElementById(mode === 'img' ? 'photoInput' : 'fileInput');
         const file = input.files[0];
         if(!file) return;
 
         const reader = new FileReader();
         reader.onload = function(e) {
-            const result = e.target.result;
+            const content = e.target.result;
             if(mode === 'img') {
                 const img = new Image();
                 img.onload = function() {
@@ -175,20 +179,40 @@
                     canvas.getContext('2d').drawImage(img, 0,0,w,h);
                     db.ref('chantiers/' + activeId + '/photos').push(canvas.toDataURL('image/jpeg', 0.6));
                 };
-                img.src = result;
+                img.src = content;
             } else {
-                // FICHIER PDF / DOC
-                if(file.size > 1000000) { alert("Fichier trop lourd (max 1Mo)"); return; }
-                db.ref('chantiers/' + activeId + '/files').push({ name: file.name, data: result });
+                if(file.size > 1500000) { alert("Fichier trop lourd (max 1.5Mo)"); return; }
+                db.ref('chantiers/' + activeId + '/files').push({ name: file.name, data: content });
             }
         };
         reader.readAsDataURL(file);
     }
 
+    function sendNotif(titre, msg) {
+        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+            method: 'POST',
+            body: msg,
+            headers: { 'Title': titre, 'Priority': 'high' }
+        }).catch(e => console.log("Erreur notif"));
+    }
+
+    function setStatus(id, s, titre) { 
+        db.ref('chantiers/' + id).update({ status: s }); 
+        if(s === 'done') sendNotif("CHANTIER FINI ✅", `Le chantier ${titre} est terminé.`);
+    }
+
+    function addPb(id, titre) { 
+        const m = prompt("Quel est le problème ?"); 
+        if(m) {
+            const time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+            db.ref('chantiers/'+id+'/reports').push(time + " : " + m);
+            db.ref('chantiers/' + id).update({ status: 'issue' });
+            sendNotif("⚠️ PROBLÈME CHANTIER", `${titre} : ${m}`);
+        }
+    }
+
     function zoom(src) { document.getElementById('fullPhoto').src = src; document.getElementById('photoOverlay').style.display = 'flex'; }
-    function setStatus(id, s) { db.ref('chantiers/' + id).update({ status: s }); }
-    function delT(id) { if(confirm("Supprimer ?")) db.ref('chantiers/'+id).remove(); }
-    function addPb(id) { const m = prompt("Pb ?"); if(m) db.ref('chantiers/'+id+'/reports').push(m); }
+    function delT(id) { if(confirm("Supprimer ce chantier ?")) db.ref('chantiers/'+id).remove(); }
 
     function ajouter() {
         const data = {
