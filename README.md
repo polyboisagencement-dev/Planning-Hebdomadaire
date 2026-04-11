@@ -2,13 +2,13 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PolyBois Planning V9.2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>PolyBois Planning V9.6</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
-        :root { --p: #1e40af; --p-light: #eff6ff; --s: #10b981; --s-light: #ecfdf5; --d: #ef4444; --d-light: #fef2f2; --txt: #1f2937; --txt-light: #6b7280; --bg: #f3f4f6; --card-bg: #ffffff; --border: #e5e7eb; --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        :root { --p: #1e40af; --p-light: #eff6ff; --s: #10b981; --s-light: #ecfdf5; --d: #ef4444; --d-light: #fef2f2; --n: #4b5563; --n-light: #f3f4f6; --txt: #1f2937; --txt-light: #6b7280; --bg: #f3f4f6; --card-bg: #ffffff; --border: #e5e7eb; --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--txt); }
         header { background: #1e3a8a; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: white; padding: 25px 15px; border-radius: 16px; margin-bottom: 20px; text-align: center; }
         .brand-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid white; background: white; margin-bottom: 10px; }
@@ -31,19 +31,32 @@
         .btn-c { flex: 1; text-decoration: none; text-align: center; padding: 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; color: white; text-transform: uppercase; }
         .waze { background: #33ccff; } .call { background: #ff9f43; }
         .footer-btns { display: flex; gap: 5px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 10px; flex-wrap: wrap; }
-        .btn-f { flex: 1; min-width: 70px; padding: 10px 4px; border: none; border-radius: 8px; font-weight: 800; font-size: 0.65rem; cursor: pointer; text-transform: uppercase; }
-        .ok { background: var(--s-light); color: var(--s); } .cam { background: var(--p-light); color: var(--p); } .pb { background: var(--d-light); color: var(--d); } .admin-btn { background: #f3f4f6; color: #4b5563; }
-        input, select { padding: 12px; border: 1px solid var(--border); border-radius: 10px; width: 100%; margin-bottom: 10px; font-size: 0.9rem; }
-        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; }
+        .btn-f { flex: 1; min-width: 65px; padding: 10px 2px; border: none; border-radius: 8px; font-weight: 800; font-size: 0.6rem; cursor: pointer; text-transform: uppercase; }
+        .ok { background: var(--s-light); color: var(--s); } .cam { background: var(--p-light); color: var(--p); } .pb { background: var(--d-light); color: var(--d); } .note { background: var(--n-light); color: var(--n); } .admin-btn { background: #eee; color: #333; }
+        .reorder-btns { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 4px; }
+        .btn-re { background: white; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 12px; }
+        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; overflow-y: auto; }
+        #fullPhoto { max-width: 100%; height: auto; touch-action: pinch-zoom; }
+        .overlay-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-dl { padding: 12px 20px; background: var(--s); color: white; border: none; border-radius: 10px; font-weight: 800; text-decoration: none; font-size: 0.8rem; }
+        .btn-close { padding: 12px 20px; background: var(--d); color: white; border: none; border-radius: 10px; font-weight: 800; font-size: 0.8rem; }
+        .badge-note { background: #fefce8; border: 1px solid #fef08a; padding: 8px; border-radius: 8px; margin-top: 8px; font-size: 0.75rem; color: #854d0e; }
     </style>
 </head>
 <body>
 
-<div id="photoOverlay" class="overlay" onclick="closePopups()"><img id="fullPhoto" src="" style="max-width:90%; border-radius:12px;"></div>
-<div id="docOverlay" class="overlay"><iframe id="fullDoc" style="width:95%; height:80vh; background:white; border-radius:12px;"></iframe><button onclick="closePopups()" style="margin-top:10px; padding:10px; background:red; color:white; border:none; border-radius:8px;">FERMER</button></div>
+<div id="photoOverlay" class="overlay">
+    <img id="fullPhoto" src="">
+    <div class="overlay-btns">
+        <a id="dlLink" href="#" download="" class="btn-dl">📥 TÉLÉCHARGER</a>
+        <button class="btn-close" onclick="closePopups()">FERMER</button>
+    </div>
+</div>
+
+<div id="docOverlay" class="overlay"><iframe id="fullDoc" style="width:95%; height:80vh; background:white; border-radius:12px;"></iframe><button onclick="closePopups()" class="btn-close" style="margin-top:10px;">FERMER</button></div>
 
 <header>
-    <img src="https://github.com/polyboisagencement-dev/Planning-Hebdomadaire/blob/main/icon.png?raw=true" alt="Logo PolyBois" class="brand-logo">
+    <img src="https://via.placeholder.com/60" alt="Logo PolyBois" class="brand-logo">
     <h1 class="brand-name">PolyBois Agencement</h1>
     <div class="planning-title">PLANNING CHANTIER HEBDOMADAIRE</div>
     <div class="nav-ctn">
@@ -57,12 +70,12 @@
 <div id="adminArea">
     <strong id="formTitle" style="color:var(--p); display:block; margin-bottom:10px; text-align:center;">AJOUTER UN CHANTIER</strong>
     <input type="hidden" id="editId">
-    <input type="text" id="fPrenom" placeholder="Prénom ouvrier">
-    <input type="text" id="fTitre" placeholder="Nom Client">
-    <input type="text" id="fAdr" placeholder="Adresse">
-    <input type="tel" id="fTel" placeholder="Téléphone">
-    <input type="text" id="fCom" placeholder="Notes">
-    <select id="fDay"><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select>
+    <input type="text" id="fPrenom" placeholder="Prénom ouvrier" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;">
+    <input type="text" id="fTitre" placeholder="Nom Client" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;">
+    <input type="text" id="fAdr" placeholder="Adresse" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;">
+    <input type="tel" id="fTel" placeholder="Téléphone" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;">
+    <input type="text" id="fCom" placeholder="Notes initiales" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;">
+    <select id="fDay" style="padding:12px; border:1px solid var(--border); border-radius:10px; width:100%; margin-bottom:10px;"><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select>
     <div id="fileZone" style="background:#f9fafb; padding:10px; border-radius:12px; margin-bottom:10px; border:1px dashed #ccc; text-align:center;">
         <label style="cursor:pointer; font-size:0.8rem; font-weight:800; color:var(--p);">📄 JOINDRE UN DOCUMENT <input type="file" id="fDocInit" style="display:none" onchange="previewFile()"></label>
         <div id="fileStatus" style="font-size:0.7rem; color:var(--txt-light);">Aucun fichier</div>
@@ -81,8 +94,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    let currentMonday = getMonday(new Date());
-    let activeId = null, isAdmin = new URLSearchParams(window.location.search).get('admin') === '1', tempFileData = null, tempFileName = "", tousLesChantiers = {};
+    let currentMonday = getMonday(new Date()), activeId = null, isAdmin = new URLSearchParams(window.location.search).get('admin') === '1', tempFileData = null, tempFileName = "", tousLesChantiers = {};
 
     if (isAdmin) document.getElementById('adminArea').style.display = 'block';
 
@@ -116,40 +128,68 @@
 
     function render(tasks) {
         document.querySelectorAll('.list').forEach(l => l.innerHTML = "");
-        tasks.sort((a,b) => (a.ord||0)-(b.ord||0)).forEach(t => {
+        const sorted = tasks.sort((a,b) => (a.ord||0)-(b.ord||0));
+        sorted.forEach((t) => {
             const list = document.getElementById('list-' + t.day);
             if(!list) return;
-
             let imgs = ""; if(t.photos) Object.keys(t.photos).forEach(k => imgs += `<img src="${t.photos[k]}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin:5px 5px 0 0;cursor:pointer;" onclick="openPhoto('${t.id}','${k}')">`);
             let docs = ""; if(t.files) Object.keys(t.files).forEach(k => docs += `<div style="background:#e0f2fe; padding:8px; border-radius:8px; font-size:0.75rem; margin-top:8px; cursor:pointer; font-weight:800;" onclick="openDoc('${t.id}','${k}')">📄 ${t.files[k].name}</div>`);
             let pbs = (t.reports) ? `<div style="background:var(--d-light); padding:8px; border-radius:8px; margin-top:10px; font-size:0.75rem; color:#9f1239;"><strong>PB :</strong>` + Object.values(t.reports).map(r => `<div>• ${r}</div>`).join('') + `</div>` : "";
+            let notesSalaries = (t.notes) ? `<div class="badge-note"><strong>Compte-rendu :</strong>` + Object.values(t.notes).map(n => `<div>• ${n}</div>`).join('') + `</div>` : "";
 
             const card = document.createElement('div');
             card.className = `card ${t.status}`;
-            card.innerHTML = `
-                <span class="prenom">${t.prenom}</span>
-                <span class="title">${t.titre}</span>
-                <div class="adr">📍 ${t.adr}</div>
-                <div class="contact-btns">
-                    <a href="waze://?q=${encodeURIComponent(t.adr)}&navigate=yes" class="btn-c waze">GPS</a>
-                    <a href="tel:${t.tel}" class="btn-c call">APPEL</a>
-                </div>
-                ${t.com ? `<div style="font-size:0.75rem; background:#f3f4f6; padding:8px; border-radius:8px;">${t.com}</div>` : ''}
+            card.innerHTML = `<div class="reorder-btns"><button class="btn-re" onclick="move('${t.id}', -1)">▲</button><button class="btn-re" onclick="move('${t.id}', 1)">▼</button></div>
+                <span class="prenom">${t.prenom}</span><span class="title">${t.titre}</span><div class="adr">📍 ${t.adr}</div>
+                <div class="contact-btns"><a href="waze://?q=${encodeURIComponent(t.adr)}&navigate=yes" class="btn-c waze">GPS</a><a href="tel:${t.tel}" class="btn-c call">APPEL</a></div>
+                ${t.com ? `<div style="font-size:0.75rem; background:#f3f4f6; padding:8px; border-radius:8px;"><strong>Note Admin:</strong> ${t.com}</div>` : ''}
+                ${notesSalaries}
                 <div style="margin-top:10px;">${imgs}</div> ${docs} ${pbs}
                 <div class="footer-btns">
                     <button class="btn-f ok" onclick="setStatus('${t.id}', 'done', '${t.titre}')">FINI</button>
                     <button class="btn-f cam" onclick="triggerUpload('${t.id}', 'img')">PHOTO</button>
-                    ${isAdmin ? `<button class="btn-f admin-btn" onclick="triggerUpload('${t.id}', 'doc')">📂 DOC</button>` : ''}
+                    <button class="btn-f note" onclick="addNote('${t.id}', '${t.titre}')">NOTE</button>
                     <button class="btn-f pb" onclick="addPb('${t.id}', '${t.titre}')">PB</button>
+                    ${isAdmin ? `<button class="btn-f admin-btn" onclick="triggerUpload('${t.id}', 'doc')">📂 DOC</button>` : ''}
                     ${isAdmin ? `<button class="btn-f admin-btn" onclick="startEdit('${t.id}')">EDIT</button>` : ''}
                 </div>
-                ${isAdmin ? `<button onclick="delT('${t.id}')" style="margin-top:8px; color:var(--d); border:none; background:none; font-size:0.65rem; cursor:pointer; width:100%; text-align:right;">SUPPRIMER</button>` : ''}
-            `;
+                ${isAdmin ? `<button onclick="delT('${t.id}')" style="margin-top:8px; color:var(--d); border:none; background:none; font-size:0.65rem; cursor:pointer; width:100%; text-align:right;">SUPPRIMER</button>` : ''}`;
             list.appendChild(card);
         });
     }
 
-    // MODIFICATION DE TACHE
+    function addNote(id, t) {
+        let m = prompt("Qu'avez-vous fait sur le chantier ?");
+        if(m) {
+            let time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+            db.ref('chantiers/'+id+'/notes').push(time + " : " + m);
+            sendNotif("NOUVELLE NOTE - " + t, m);
+        }
+    }
+
+    function openPhoto(id, k) {
+        const t = tousLesChantiers[id];
+        const dataUrl = t.photos[k];
+        const fileName = `${t.titre.replace(/[^a-z0-req0-9]/gi, '_')}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.jpg`;
+        document.getElementById('fullPhoto').src = dataUrl;
+        document.getElementById('dlLink').href = dataUrl;
+        document.getElementById('dlLink').download = fileName;
+        document.getElementById('photoOverlay').style.display='flex';
+    }
+
+    function move(id, direction) {
+        const task = tousLesChantiers[id];
+        const sameDay = Object.values(tousLesChantiers).filter(t => t.day == task.day).sort((a,b) => (a.ord||0)-(b.ord||0));
+        const idx = sameDay.findIndex(t => t.id === id);
+        const newIdx = idx + direction;
+        if (newIdx >= 0 && newIdx < sameDay.length) {
+            const swapTask = sameDay[newIdx];
+            const tempOrd = task.ord || 0;
+            db.ref('chantiers/'+task.id).update({ ord: swapTask.ord || 0 });
+            db.ref('chantiers/'+swapTask.id).update({ ord: tempOrd });
+        }
+    }
+
     function startEdit(id) {
         const t = tousLesChantiers[id];
         document.getElementById('editId').value = id;
@@ -179,34 +219,18 @@
 
     function ajouter() {
         const id = document.getElementById('editId').value;
-        const data = { 
-            prenom:document.getElementById('fPrenom').value, 
-            titre:document.getElementById('fTitre').value, 
-            adr:document.getElementById('fAdr').value, 
-            tel:document.getElementById('fTel').value, 
-            com:document.getElementById('fCom').value, 
-            day:document.getElementById('fDay').value 
-        };
-
-        if(id) {
-            db.ref('chantiers/'+id).update(data).then(() => resetForm());
-        } else {
+        const data = { prenom:document.getElementById('fPrenom').value, titre:document.getElementById('fTitre').value, adr:document.getElementById('fAdr').value, tel:document.getElementById('fTel').value, com:document.getElementById('fCom').value, day:document.getElementById('fDay').value };
+        if(id) { db.ref('chantiers/'+id).update(data).then(() => resetForm()); } 
+        else {
             const ref = db.ref('chantiers').push();
-            data.id = ref.key;
-            data.weekID = getWeekID(currentMonday);
-            data.status = 'pending';
-            data.ord = Date.now();
-            ref.set(data).then(() => {
-                if(tempFileData) db.ref('chantiers/'+data.id+'/files').push({name:tempFileName, data:tempFileData});
-                resetForm();
-            });
+            data.id = ref.key; data.weekID = getWeekID(currentMonday); data.status = 'pending'; data.ord = Date.now();
+            ref.set(data).then(() => { if(tempFileData) db.ref('chantiers/'+data.id+'/files').push({name:tempFileName, data:tempFileData}); resetForm(); });
         }
     }
 
     function sendNotif(titre, msg) { fetch('https://ntfy.sh/Alerte_chantier', { method: 'POST', body: titre + "\n" + msg }); }
     function setStatus(id, s, t) { db.ref('chantiers/'+id).update({status:s}); if(s==='done') sendNotif("CHANTIER TERMINE", t); }
-    function addPb(id, t) { let m = prompt("Problème ?"); if(m) { let time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}); db.ref('chantiers/'+id+'/reports').push(time + " : " + m); db.ref('chantiers/'+id).update({status:'issue'}); sendNotif("ALERTE PB", t + " : " + m); } }
-    function openPhoto(id, k) { document.getElementById('fullPhoto').src = tousLesChantiers[id].photos[k]; document.getElementById('photoOverlay').style.display='flex'; }
+    function addPb(id, t) { let m = prompt("Problème ?"); if(m) { let time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}); db.ref('chantiers/'+id+'/reports').push(time + " : " + m); db.ref('chantiers/'+id).update({status:'issue'}); sendNotif("ALERTE PB - " + t, m); } }
     function openDoc(id, k) { let f = tousLesChantiers[id].files[k]; document.getElementById('fullDoc').src = f.data; document.getElementById('docOverlay').style.display='flex'; }
     function closePopups() { document.querySelectorAll('.overlay').forEach(o => o.style.display='none'); document.getElementById('fullDoc').src=""; }
     function triggerUpload(id, type) { activeId = id; document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click(); }
@@ -219,12 +243,10 @@
             if(mode === 'img') {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX = 800; let w = img.width, h = img.height;
+                    const canvas = document.createElement('canvas'); const MAX = 1200; let w = img.width, h = img.height;
                     if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0,0,w,h);
-                    db.ref('chantiers/'+activeId+'/photos').push(canvas.toDataURL('image/jpeg', 0.6));
+                    canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0,0,w,h);
+                    db.ref('chantiers/'+activeId+'/photos').push(canvas.toDataURL('image/jpeg', 0.8));
                 };
                 img.src = e.target.result;
             } else { db.ref('chantiers/'+activeId+'/files').push({name:file.name, data:e.target.result}); }
