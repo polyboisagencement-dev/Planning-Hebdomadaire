@@ -62,7 +62,7 @@
 <div id="docOverlay" class="overlay"><iframe id="fullDoc" style="width:100%; height:70vh; background:white; border-radius:12px;"></iframe><button onclick="closePopups()" style="margin-top:15px; padding:12px 25px; background:var(--d); color:white; border:none; border-radius:10px; font-weight:800;">FERMER</button></div>
 
 <header>
-    <img src="https://via.placeholder.com/60" alt="Logo PolyBois" class="brand-logo">
+    <img src="https://github.com/polyboisagencement-dev/Planning-Hebdomadaire/blob/main/icon.png?raw=true" alt="Logo PolyBois" class="brand-logo">
     <h1 class="brand-name">PolyBois Agencement</h1>
     <div class="planning-title">PLANNING CHANTIER HEBDOMADAIRE</div>
     
