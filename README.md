@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planning Pro V6</title>
+    <title>Planning Pro V7</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -11,11 +11,14 @@
         body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         header { background: #1e40af; color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
         
+        /* FORMULAIRE ADMIN AMELIORÉ */
         #adminArea { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 3px solid var(--p); display: none; }
+        .file-input-wrapper { background: #eff6ff; border: 2px dashed #bfdbfe; padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: center; }
+        .file-status { font-size: 0.75rem; color: #1e40af; font-weight: bold; margin-top: 5px; }
         
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
         .col { background: #e2e8f0; border-radius: 12px; padding: 10px; min-height: 200px; }
-        .day-h { text-align: center; font-weight: bold; color: #1e40af; padding: 10px; text-transform: uppercase; border-bottom: 2px solid #cbd5e1; }
+        .day-h { text-align: center; font-weight: bold; color: #1e40af; padding: 10px; text-transform: uppercase; }
 
         .card { background: white; padding: 15px; border-radius: 12px; margin-top: 10px; border-left: 6px solid #94a3b8; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .card.done { border-left-color: var(--s); background: #f0fdf4; }
@@ -49,14 +52,26 @@
 </header>
 
 <div id="adminArea">
-    <strong style="color:var(--p);">MODE ADMIN : AJOUTER UN CHANTIER</strong>
+    <strong style="color:var(--p);">CRÉATION DE CHANTIER</strong>
     <input type="text" id="fPrenom" placeholder="Prénom de l'ouvrier">
     <input type="text" id="fTitre" placeholder="Nom du Client / Chantier">
     <input type="text" id="fAdr" placeholder="Adresse complète">
     <input type="tel" id="fTel" placeholder="Téléphone">
-    <input type="text" id="fCom" placeholder="Notes (Code portail, etc.)">
-    <select id="fDay"><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select>
-    <button style="background:var(--p); color:white; width:100%; border:none; padding:15px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="ajouter()">AJOUTER AU PLANNING</button>
+    <input type="text" id="fCom" placeholder="Notes / Infos">
+    <select id="fDay">
+        <option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option>
+        <option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option>
+    </select>
+    
+    <div class="file-input-wrapper">
+        <label style="font-size: 0.8rem; font-weight: bold; color: #2563eb; cursor: pointer;">
+            📁 JOINDRE UN DOCUMENT (PDF, PLAN...)
+            <input type="file" id="fDocInit" style="display:none" onchange="previewFile()">
+        </label>
+        <div id="fileStatus" class="file-status">Aucun fichier sélectionné</div>
+    </div>
+
+    <button id="btnAjouter" style="background:var(--p); color:white; width:100%; border:none; padding:15px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="ajouter()">AJOUTER AU PLANNING</button>
 </div>
 
 <div class="grid" id="board"></div>
@@ -77,8 +92,9 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    // NOM DU CANAL DE NOTIFICATION
     const NTFY_TOPIC = "mon_planning_chantier_77"; 
+    let tempFileData = null;
+    let tempFileName = "";
 
     let currentMonday = getMonday(new Date());
     let activeId = null;
@@ -97,6 +113,21 @@
         d.setHours(0,0,0,0);
         d.setDate(d.getDate() + 4 - (d.getDay() || 7));
         return d.getFullYear() + "-W" + Math.ceil((((d - new Date(d.getFullYear(),0,1)) / 86400000) + 1) / 7);
+    }
+
+    function previewFile() {
+        const file = document.getElementById('fDocInit').files[0];
+        if(!file) return;
+        if(file.size > 1500000) { alert("Fichier trop lourd (max 1.5Mo)"); return; }
+        
+        tempFileName = file.name;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            tempFileData = e.target.result;
+            document.getElementById('fileStatus').innerText = "✅ Prêt : " + tempFileName;
+            document.getElementById('fileStatus').style.color = "#10b981";
+        };
+        reader.readAsDataURL(file);
     }
 
     function changeWeek(days) { currentMonday.setDate(currentMonday.getDate() + days); updateCalendar(); }
@@ -124,10 +155,7 @@
             if(t.photos) Object.values(t.photos).forEach(src => imgs += `<img src="${src}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;margin:5px;cursor:pointer;border:1px solid #ddd;" onclick="zoom('${src}')">`);
 
             let docs = "";
-            if(t.files) Object.values(t.files).forEach(f => docs += `<a href="${f.data}" target="_blank" class="file-link">📄 DOCUMENT : ${f.name}</a>`);
-
-            let pbs = "";
-            if(t.reports) pbs = `<div style="background:#fee2e2;color:#b91c1c;padding:10px;border-radius:8px;margin-top:10px;font-size:0.8rem;">` + Object.values(t.reports).map(r => `<div>⚠️ ${r}</div>`).join('') + `</div>`;
+            if(t.files) Object.values(t.files).forEach(f => docs += `<a href="${f.data}" target="_blank" class="file-link">📄 ${f.name}</a>`);
 
             const card = document.createElement('div');
             card.className = `card ${t.status}`;
@@ -142,29 +170,24 @@
                 ${t.com ? `<div style="margin-top:10px;font-size:0.8rem;background:#f1f5f9;padding:10px;border-radius:8px;border:1px solid #eee;">${t.com}</div>` : ''}
                 <div style="margin-top:10px;">${imgs}</div>
                 <div>${docs}</div>
-                ${pbs}
                 <div class="footer-btns">
                     <button class="btn-f ok" onclick="setStatus('${t.id}', 'done', '${t.titre}')">FINI ✅</button>
                     <button class="btn-f cam" onclick="triggerUpload('${t.id}', 'img')">PHOTO 📸</button>
-                    ${isAdmin ? `<button class="btn-f admin-file" onclick="triggerUpload('${t.id}', 'file')">FICHIER 📂</button>` : ''}
+                    ${isAdmin ? `<button class="btn-f admin-file" onclick="triggerUpload('${t.id}', 'file')">DOC 📂</button>` : ''}
                     <button class="btn-f pb" onclick="addPb('${t.id}', '${t.titre}')">PB ❌</button>
                 </div>
-                ${isAdmin ? `<button onclick="delT('${t.id}')" style="color:red;border:none;background:none;font-size:0.6rem;margin-top:15px;cursor:pointer;font-weight:bold;">[SUPPRIMER CHANTIER]</button>` : ''}
+                ${isAdmin ? `<button onclick="delT('${t.id}')" style="color:red;border:none;background:none;font-size:0.6rem;margin-top:15px;cursor:pointer;font-weight:bold;">[SUPPRIMER]</button>` : ''}
             `;
             list.appendChild(card);
         });
     }
 
-    function triggerUpload(id, type) {
-        activeId = id;
-        document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click();
-    }
+    function triggerUpload(id, type) { activeId = id; document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click(); }
 
     function uploadFile(mode) {
         const input = document.getElementById(mode === 'img' ? 'photoInput' : 'fileInput');
         const file = input.files[0];
         if(!file) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             const content = e.target.result;
@@ -181,7 +204,6 @@
                 };
                 img.src = content;
             } else {
-                if(file.size > 1500000) { alert("Fichier trop lourd (max 1.5Mo)"); return; }
                 db.ref('chantiers/' + activeId + '/files').push({ name: file.name, data: content });
             }
         };
@@ -189,11 +211,7 @@
     }
 
     function sendNotif(titre, msg) {
-        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
-            method: 'POST',
-            body: msg,
-            headers: { 'Title': titre, 'Priority': 'high' }
-        }).catch(e => console.log("Erreur notif"));
+        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { method: 'POST', body: msg, headers: { 'Title': titre, 'Priority': 'high' } }).catch(e => {});
     }
 
     function setStatus(id, s, titre) { 
@@ -212,10 +230,12 @@
     }
 
     function zoom(src) { document.getElementById('fullPhoto').src = src; document.getElementById('photoOverlay').style.display = 'flex'; }
-    function delT(id) { if(confirm("Supprimer ce chantier ?")) db.ref('chantiers/'+id).remove(); }
+    function delT(id) { if(confirm("Supprimer ?")) db.ref('chantiers/'+id).remove(); }
 
     function ajouter() {
+        const ref = db.ref('chantiers').push();
         const data = {
+            id: ref.key,
             day: document.getElementById('fDay').value,
             prenom: document.getElementById('fPrenom').value,
             titre: document.getElementById('fTitre').value,
@@ -226,10 +246,19 @@
             status: 'pending',
             ord: Date.now()
         };
-        const ref = db.ref('chantiers').push();
-        data.id = ref.key;
-        ref.set(data);
-        ["fTitre","fAdr","fTel","fCom","fPrenom"].forEach(i => document.getElementById(i).value = "");
+        
+        ref.set(data).then(() => {
+            // Si un fichier a été sélectionné, on l'ajoute maintenant
+            if(tempFileData) {
+                db.ref('chantiers/' + data.id + '/files').push({ name: tempFileName, data: tempFileData });
+            }
+            // Reset du formulaire
+            ["fTitre","fAdr","fTel","fCom","fPrenom"].forEach(i => document.getElementById(i).value = "");
+            document.getElementById('fDocInit').value = "";
+            document.getElementById('fileStatus').innerText = "Aucun fichier sélectionné";
+            document.getElementById('fileStatus').style.color = "#1e40af";
+            tempFileData = null;
+        });
     }
     updateCalendar();
 </script>
