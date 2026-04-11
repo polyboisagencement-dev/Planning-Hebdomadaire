@@ -110,7 +110,7 @@
 
 <header>
     <div class="brand">
-        <img src="https://via.placeholder.com/50" alt="Logo">
+        <img src="https://github.com/polyboisagencement-dev/Planning-Hebdomadaire/blob/main/icon.png?raw=true" alt="Logo">
         <h1>Planning <span style="font-weight:400; opacity:0.8">Chantiers</span></h1>
     </div>
     <div class="nav-ctn">
