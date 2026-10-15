@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PolyBois Agencement V10.4</title>
+    <title>PolyBois Agencement V10.6</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -46,7 +46,7 @@
         #fileList { text-align: left; margin: 10px 0; font-size: 0.75rem; }
         .file-item { background: #fff; padding: 5px 10px; border-radius: 5px; margin-bottom: 3px; display: flex; justify-content: space-between; border: 1px solid #eee; }
         
-        /* Zone cases à cocher Prénoms ouvriers */
+        /* Zone cases à cocher */
         .prenoms-ctn { background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 10px; }
         .prenoms-title { font-size: 0.75rem; font-weight: 800; color: var(--txt-light); margin-bottom: 8px; text-transform: uppercase; }
         .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
@@ -93,8 +93,12 @@
     <input type="text" id="fAdr" placeholder="Adresse" list="listAdresses">
     <datalist id="listAdresses"></datalist>
 
-    <input type="tel" id="fTel" placeholder="Téléphone" list="listTelephones">
-    <datalist id="listTelephones"></datalist>
+    <div class="prenoms-ctn">
+        <div class="prenoms-title">Téléphone(s) :</div>
+        <div class="checkbox-grid" id="telephonesCheckboxes"></div>
+        <input type="tel" id="fTelExtra" placeholder="+ Ajouter un nouveau numéro" list="listTelephones" style="margin-bottom:0;">
+        <datalist id="listTelephones"></datalist>
+    </div>
 
     <input type="text" id="fCom" placeholder="Notes initiales">
     
@@ -144,7 +148,16 @@
         });
         db.ref('base_donnees/telephones').on('value', snap => {
             const data = snap.val() || {};
-            document.getElementById('listTelephones').innerHTML = Object.values(data).map(val => `<option value="${val}">`).join('');
+            const list = Object.values(data);
+
+            const ctn = document.getElementById('telephonesCheckboxes');
+            const selected = getSelectedTelephones();
+            ctn.innerHTML = list.map(t => {
+                const isChecked = selected.includes(t) ? 'checked' : '';
+                return `<label class="checkbox-item"><input type="checkbox" value="${t}" ${isChecked}> ${t}</label>`;
+            }).join('');
+
+            document.getElementById('listTelephones').innerHTML = list.map(val => `<option value="${val}">`).join('');
         });
     }
 
@@ -165,6 +178,25 @@
             cb.checked = list.includes(cb.value.trim().toUpperCase());
         });
         document.getElementById('fPrenomExtra').value = "";
+    }
+
+    function getSelectedTelephones() {
+        const checkboxes = document.querySelectorAll('#telephonesCheckboxes input[type="checkbox"]:checked');
+        const selected = Array.from(checkboxes).map(cb => cb.value.trim());
+        const extra = document.getElementById('fTelExtra').value.trim();
+        if (extra && !selected.includes(extra)) {
+            selected.push(extra);
+        }
+        return selected;
+    }
+
+    function setSelectedTelephones(telString) {
+        const list = telString ? telString.split(',').map(s => s.trim()) : [];
+        const checkboxes = document.querySelectorAll('#telephonesCheckboxes input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.checked = list.includes(cb.value.trim());
+        });
+        document.getElementById('fTelExtra').value = "";
     }
 
     function saveToDatabase(category, value) {
@@ -235,11 +267,14 @@
                 timeBadge += `</div>`;
             }
 
+            const firstTel = (t.tel || '').split(',')[0].trim();
+
             const card = document.createElement('div');
             card.className = `card ${t.status}`;
             card.innerHTML = `<div class="reorder-btns"><button class="btn-re" onclick="move('${t.id}', -1)">▲</button><button class="btn-re" onclick="move('${t.id}', 1)">▼</button></div>
                 <span class="prenom">${t.prenom}</span><span class="title">${t.titre}</span><div class="adr">📍 ${t.adr}</div>
-                <div class="contact-btns"><a href="waze://?q=${encodeURIComponent(t.adr)}&navigate=yes" class="btn-c waze">GPS</a><a href="tel:${t.tel}" class="btn-c call">APPEL</a></div>
+                ${t.tel ? `<div style="font-size:0.8rem; font-weight:700; color:var(--txt-light); margin-bottom:8px;">📞 ${t.tel}</div>` : ''}
+                <div class="contact-btns"><a href="waze://?q=${encodeURIComponent(t.adr)}&navigate=yes" class="btn-c waze">GPS</a><a href="tel:${firstTel}" class="btn-c call">APPEL</a></div>
                 ${t.com ? `<div style="font-size:0.75rem; background:#f3f4f6; padding:8px; border-radius:8px;"><strong>Note Admin:</strong> ${t.com}</div>` : ''}
                 ${notesSalaries}
                 ${timeBadge}
@@ -247,7 +282,6 @@
                 <div class="footer-btns">
                     <button class="btn-f btn-start" onclick="setChantierTime('${t.id}', 'start', '${t.titre}')">DÉBUT</button>
                     <button class="btn-f btn-end" onclick="setChantierTime('${t.id}', 'end', '${t.titre}')">FIN</button>
-                    <button class="btn-f ok" onclick="setStatus('${t.id}', 'done', '${t.titre}')">FINI</button>
                     <button class="btn-f cam" onclick="triggerUpload('${t.id}', 'img')">PHOTO</button>
                     <button class="btn-f note" onclick="addNote('${t.id}', '${t.titre}')">NOTE</button>
                     <button class="btn-f pb" onclick="addPb('${t.id}', '${t.titre}')">PB</button>
@@ -278,12 +312,15 @@
         const id = document.getElementById('editId').value;
         const selectedPrenoms = getSelectedPrenoms();
         const prenomVal = selectedPrenoms.join(', ');
+
+        const selectedTelephones = getSelectedTelephones();
+        const telVal = selectedTelephones.join(', ');
+
         const adrVal = document.getElementById('fAdr').value;
-        const telVal = document.getElementById('fTel').value;
 
         selectedPrenoms.forEach(p => saveToDatabase('prenoms', p));
+        selectedTelephones.forEach(t => saveToDatabase('telephones', t));
         saveToDatabase('adresses', adrVal);
-        saveToDatabase('telephones', telVal);
 
         const data = { 
             prenom: prenomVal, titre: document.getElementById('fTitre').value, 
@@ -306,8 +343,9 @@
 
     function resetForm() {
         document.getElementById('editId').value = "";
-        ["fTitre","fAdr","fTel","fCom","fPrenomExtra"].forEach(i => document.getElementById(i).value="");
+        ["fTitre","fAdr","fCom","fPrenomExtra","fTelExtra"].forEach(i => document.getElementById(i).value="");
         setSelectedPrenoms("");
+        setSelectedTelephones("");
         document.getElementById('formTitle').innerText = "AJOUTER UN CHANTIER";
         document.getElementById('btnSubmit').innerText = "VALIDER";
         document.getElementById('btnCancel').style.display = "none";
@@ -325,7 +363,7 @@
     function openDoc(id, k) { let f = tousLesChantiers[id].files[k]; document.getElementById('fullDoc').src = f.data; document.getElementById('docOverlay').style.display='flex'; }
     function closePopups() { document.querySelectorAll('.overlay').forEach(o => o.style.display='none'); document.getElementById('fullDoc').src=""; }
     function triggerUpload(id, type) { activeId = id; document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click(); }
-    function startEdit(id) { const t = tousLesChantiers[id]; document.getElementById('editId').value = id; setSelectedPrenoms(t.prenom || ""); document.getElementById('fTitre').value = t.titre || ""; document.getElementById('fAdr').value = t.adr || ""; document.getElementById('fTel').value = t.tel || ""; document.getElementById('fCom').value = t.com || ""; document.getElementById('fDay').value = t.day; document.getElementById('formTitle').innerText = "MODIFIER LE CHANTIER"; document.getElementById('btnSubmit').innerText = "METTRE À JOUR"; document.getElementById('btnCancel').style.display = "block"; document.getElementById('fileZone').style.display = "none"; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function startEdit(id) { const t = tousLesChantiers[id]; document.getElementById('editId').value = id; setSelectedPrenoms(t.prenom || ""); setSelectedTelephones(t.tel || ""); document.getElementById('fTitre').value = t.titre || ""; document.getElementById('fAdr').value = t.adr || ""; document.getElementById('fCom').value = t.com || ""; document.getElementById('fDay').value = t.day; document.getElementById('formTitle').innerText = "MODIFIER LE CHANTIER"; document.getElementById('btnSubmit').innerText = "METTRE À JOUR"; document.getElementById('btnCancel').style.display = "block"; document.getElementById('fileZone').style.display = "none"; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function uploadFile(mode) { const file = document.getElementById(mode === 'img' ? 'photoInput' : 'fileInput').files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { if(mode === 'img') { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 1200; let w = img.width, h = img.height; if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0,0,w,h); db.ref('chantiers/'+activeId+'/photos').push(canvas.toDataURL('image/jpeg', 0.8)); }; img.src = e.target.result; } else { db.ref('chantiers/'+activeId+'/files').push({name:file.name, data:e.target.result}); } }; reader.readAsDataURL(file); }
     function delT(id) { if(confirm("Supprimer ?")) db.ref('chantiers/'+id).remove(); }
     
