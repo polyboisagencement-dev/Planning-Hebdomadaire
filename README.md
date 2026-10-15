@@ -1,9 +1,9 @@
-
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PolyBois Agencement V10.6</title>
+    <title>PolyBois Agencement V10.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -52,6 +52,8 @@
         .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
         .checkbox-item { background: #f3f4f6; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .checkbox-item input { width: auto; margin: 0; cursor: pointer; }
+        .tel-inputs-flex { display: flex; gap: 8px; }
+        .tel-inputs-flex input { flex: 1; margin-bottom: 0; }
     </style>
 </head>
 <body>
@@ -94,9 +96,12 @@
     <datalist id="listAdresses"></datalist>
 
     <div class="prenoms-ctn">
-        <div class="prenoms-title">Téléphone(s) :</div>
+        <div class="prenoms-title">Téléphone(s) / Contact(s) :</div>
         <div class="checkbox-grid" id="telephonesCheckboxes"></div>
-        <input type="tel" id="fTelExtra" placeholder="+ Ajouter un nouveau numéro" list="listTelephones" style="margin-bottom:0;">
+        <div class="tel-inputs-flex">
+            <input type="text" id="fTelNameExtra" placeholder="Prénom contact">
+            <input type="tel" id="fTelExtra" placeholder="Numéro de téléphone" list="listTelephones">
+        </div>
         <datalist id="listTelephones"></datalist>
     </div>
 
@@ -153,11 +158,15 @@
             const ctn = document.getElementById('telephonesCheckboxes');
             const selected = getSelectedTelephones();
             ctn.innerHTML = list.map(t => {
-                const isChecked = selected.includes(t) ? 'checked' : '';
-                return `<label class="checkbox-item"><input type="checkbox" value="${t}" ${isChecked}> ${t}</label>`;
+                const valStr = typeof t === 'object' ? `${t.num}${t.nom ? ' ('+t.nom+')' : ''}` : t;
+                const isChecked = selected.some(s => s.toLowerCase() === valStr.toLowerCase()) ? 'checked' : '';
+                return `<label class="checkbox-item"><input type="checkbox" value="${valStr}" ${isChecked}> ${valStr}</label>`;
             }).join('');
 
-            document.getElementById('listTelephones').innerHTML = list.map(val => `<option value="${val}">`).join('');
+            document.getElementById('listTelephones').innerHTML = list.map(t => {
+                const valStr = typeof t === 'object' ? t.num : t;
+                return `<option value="${valStr}">`;
+            }).join('');
         });
     }
 
@@ -183,9 +192,13 @@
     function getSelectedTelephones() {
         const checkboxes = document.querySelectorAll('#telephonesCheckboxes input[type="checkbox"]:checked');
         const selected = Array.from(checkboxes).map(cb => cb.value.trim());
-        const extra = document.getElementById('fTelExtra').value.trim();
-        if (extra && !selected.includes(extra)) {
-            selected.push(extra);
+        const extraNum = document.getElementById('fTelExtra').value.trim();
+        const extraName = document.getElementById('fTelNameExtra').value.trim();
+        if (extraNum) {
+            const fullStr = `${extraNum}${extraName ? ' (' + extraName + ')' : ''}`;
+            if (!selected.includes(fullStr)) {
+                selected.push(fullStr);
+            }
         }
         return selected;
     }
@@ -194,9 +207,10 @@
         const list = telString ? telString.split(',').map(s => s.trim()) : [];
         const checkboxes = document.querySelectorAll('#telephonesCheckboxes input[type="checkbox"]');
         checkboxes.forEach(cb => {
-            cb.checked = list.includes(cb.value.trim());
+            cb.checked = list.some(l => l.toLowerCase() === cb.value.trim().toLowerCase());
         });
         document.getElementById('fTelExtra').value = "";
+        document.getElementById('fTelNameExtra').value = "";
     }
 
     function saveToDatabase(category, value) {
@@ -205,7 +219,10 @@
         const ref = db.ref('base_donnees/' + category);
         ref.once('value', snap => {
             const data = snap.val() || {};
-            const exists = Object.values(data).some(v => v.toLowerCase() === cleanVal.toLowerCase());
+            const exists = Object.values(data).some(v => {
+                const str = typeof v === 'object' ? `${v.num}${v.nom ? ' ('+v.nom+')' : ''}` : v;
+                return str.toLowerCase() === cleanVal.toLowerCase();
+            });
             if (!exists) {
                 ref.push(cleanVal);
             }
@@ -267,14 +284,15 @@
                 timeBadge += `</div>`;
             }
 
-            const firstTel = (t.tel || '').split(',')[0].trim();
+            const rawTel = (t.tel || '').split(',')[0].trim();
+            const cleanCallTel = rawTel.replace(/\([^)]*\)/g, '').trim();
 
             const card = document.createElement('div');
             card.className = `card ${t.status}`;
             card.innerHTML = `<div class="reorder-btns"><button class="btn-re" onclick="move('${t.id}', -1)">▲</button><button class="btn-re" onclick="move('${t.id}', 1)">▼</button></div>
                 <span class="prenom">${t.prenom}</span><span class="title">${t.titre}</span><div class="adr">📍 ${t.adr}</div>
                 ${t.tel ? `<div style="font-size:0.8rem; font-weight:700; color:var(--txt-light); margin-bottom:8px;">📞 ${t.tel}</div>` : ''}
-                <div class="contact-btns"><a href="waze://?q=${encodeURIComponent(t.adr)}&navigate=yes" class="btn-c waze">GPS</a><a href="tel:${firstTel}" class="btn-c call">APPEL</a></div>
+                <div class="contact-btns"><a href="waze://?q=${encodeURIComponent(t.adr)}&navigate=yes" class="btn-c waze">GPS</a><a href="tel:${cleanCallTel}" class="btn-c call">APPEL</a></div>
                 ${t.com ? `<div style="font-size:0.75rem; background:#f3f4f6; padding:8px; border-radius:8px;"><strong>Note Admin:</strong> ${t.com}</div>` : ''}
                 ${notesSalaries}
                 ${timeBadge}
@@ -343,7 +361,7 @@
 
     function resetForm() {
         document.getElementById('editId').value = "";
-        ["fTitre","fAdr","fCom","fPrenomExtra","fTelExtra"].forEach(i => document.getElementById(i).value="");
+        ["fTitre","fAdr","fCom","fPrenomExtra","fTelExtra","fTelNameExtra"].forEach(i => document.getElementById(i).value="");
         setSelectedPrenoms("");
         setSelectedTelephones("");
         document.getElementById('formTitle').innerText = "AJOUTER UN CHANTIER";
