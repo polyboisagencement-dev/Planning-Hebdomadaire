@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PolyBois Agencement V11.1</title>
+    <title>PolyBois Agencement V11.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -16,8 +16,6 @@
         .btn-nav { padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
         .btn-nav.today { background: white; color: #1e3a8a; border: none; }
         #adminArea { background: var(--card-bg); padding: 20px; border-radius: 16px; margin-bottom: 25px; border: 2px dashed var(--p); display: none; position: relative; z-index: 10; }
-        .admin-section { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 15px; }
-        .admin-section-title { font-size: 0.8rem; font-weight: 800; color: #334155; text-transform: uppercase; margin-bottom: 8px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 20px; }
         .col { background: #e5e7eb; border-radius: 16px; padding: 12px; min-height: 250px; }
         .day-h { text-align: center; font-weight: 800; color: #1e40af; padding: 12px; text-transform: uppercase; font-size: 0.9rem; border-bottom: 1px solid #d1d5db; margin-bottom: 10px; }
@@ -47,7 +45,6 @@
         #fileList { text-align: left; margin: 10px 0; font-size: 0.75rem; }
         .file-item { background: #fff; padding: 5px 10px; border-radius: 5px; margin-bottom: 3px; display: flex; justify-content: space-between; border: 1px solid #eee; }
         
-        /* Zone cases à cocher avec suppression */
         .prenoms-ctn { background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 10px; }
         .prenoms-title { font-size: 0.75rem; font-weight: 800; color: var(--txt-light); margin-bottom: 8px; text-transform: uppercase; }
         .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
@@ -59,6 +56,9 @@
         .tel-inputs-flex input { flex: 1; margin-bottom: 0; }
         .btn-del-task { margin-top:10px; color:var(--d); border:none; background:none; font-size:0.7rem; font-weight:800; cursor:pointer; width:100%; text-align:right; text-transform:uppercase; padding:5px 0; }
         .btn-del-task:hover { text-decoration: underline; }
+
+        /* Bloc modification Logo */
+        .logo-admin-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -74,7 +74,7 @@
 <div id="docOverlay" class="overlay"><iframe id="fullDoc" style="width:95%; height:80vh; background:white; border-radius:12px;"></iframe><button onclick="closePopups()" class="btn-close" style="margin-top:10px;">FERMER</button></div>
 
 <header>
-    <img id="companyLogo" src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=200&q=80" alt="Logo PolyBois Agencement" class="brand-logo">
+    <img id="headerLogo" src="https://via.placeholder.com/65" alt="Logo PolyBois Agencement" class="brand-logo">
     <h1 class="brand-name">PolyBois Agencement</h1>
     <div class="nav-ctn">
         <button onclick="changeWeek(-7)" class="btn-nav">◄ PRÉC.</button>
@@ -85,16 +85,15 @@
 </header>
 
 <div id="adminArea">
-    <!-- NOUVELLE SECTION DE GESTION DU LOGO -->
-    <div class="admin-section">
-        <div class="admin-section-title">🎨 MODIFIER LE LOGO DE LA SOCIÉTÉ</div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <input type="text" id="logoUrlInput" placeholder="URL de l'image du logo (ex: https://...)" style="margin-bottom:0; flex:2; min-width:200px;">
-            <button onclick="saveLogoUrl()" style="background:#059669; color:white; border:none; padding:12px 15px; border-radius:10px; font-weight:800; cursor:pointer; flex:1; min-width:120px;">ENREGISTRER URL</button>
-            <label style="background:#3b82f6; color:white; padding:12px 15px; border-radius:10px; font-weight:800; cursor:pointer; font-size:0.85rem; text-align:center; flex:1; min-width:140px;">
-                🖼️ IMPORTER IMAGE
-                <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="uploadLogoFile(this.files)">
+    <!-- BLOC MODIFICATION LOGO -->
+    <div class="logo-admin-box">
+        <strong style="color:var(--p); display:block; margin-bottom:8px; font-size:0.85rem; text-transform:uppercase;">🖼️ MODIFIER LE LOGO</strong>
+        <input type="text" id="logoUrlInput" placeholder="URL de l'image du logo (https://...)" style="margin-bottom:8px;">
+        <div style="display:flex; gap:8px; align-items:center;">
+            <label style="flex:1; background:#fff; border:1px solid var(--border); padding:10px; border-radius:8px; text-align:center; font-size:0.75rem; font-weight:800; cursor:pointer; color:var(--txt-light);">
+                📁 Choisir une image <input type="file" id="logoFileInput" accept="image/*" style="display:none;" onchange="uploadLogoFile(this.files[0])">
             </label>
+            <button onclick="saveLogoUrl()" style="flex:1; background:var(--s); color:white; border:none; padding:10px; border-radius:8px; font-weight:800; font-size:0.75rem; cursor:pointer;">ENREGISTRER LE LOGO</button>
         </div>
     </div>
 
@@ -143,7 +142,6 @@
 <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx" style="display:none" onchange="uploadFile('doc')">
 
 <script>
-    const DEFAULT_LOGO = "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=200&q=80";
     const firebaseConfig = { apiKey: "AIzaSyBqKxFN6W_2LzI82P4kKrKcfJqQAVh7SYs", authDomain: "planning-chantier-3f4ac.firebaseapp.com", databaseURL: "https://planning-chantier-3f4ac-default-rtdb.europe-west1.firebasedatabase.app/", projectId: "planning-chantier-3f4ac", storageBucket: "planning-chantier-3f4ac.firebasestorage.app", messagingSenderId: "73313634289", appId: "1:73313634289:web:794065392de1411e2c2650" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -152,32 +150,24 @@
 
     if (isAdmin) document.getElementById('adminArea').style.display = 'block';
 
-    // ÉCOUTE DU LOGO EN TEMPS RÉEL DANS FIREBASE
+    // Gestion du Logo
     db.ref('config/logoUrl').on('value', snap => {
-        const logoUrl = snap.val();
-        const logoImg = document.getElementById('companyLogo');
-        if (logoUrl && logoUrl.trim() !== "") {
-            logoImg.src = logoUrl;
-            if(isAdmin) document.getElementById('logoUrlInput').value = logoUrl;
-        } else {
-            logoImg.src = DEFAULT_LOGO;
+        const url = snap.val();
+        if (url) {
+            document.getElementById('headerLogo').src = url;
+            document.getElementById('logoUrlInput').value = url;
         }
     });
 
     function saveLogoUrl() {
         const url = document.getElementById('logoUrlInput').value.trim();
-        if(!url) {
-            if(confirm("Réinitialiser le logo par défaut ?")) {
-                db.ref('config/logoUrl').remove();
-            }
-            return;
+        if (url) {
+            db.ref('config/logoUrl').set(url).then(() => alert("Logo mis à jour !"));
         }
-        db.ref('config/logoUrl').set(url).then(() => alert("Logo mis à jour avec succès !"));
     }
 
-    function uploadLogoFile(files) {
-        if (!files || !files[0]) return;
-        const file = files[0];
+    function uploadLogoFile(file) {
+        if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
@@ -185,12 +175,11 @@
                 const canvas = document.createElement('canvas');
                 const MAX = 400;
                 let w = img.width, h = img.height;
-                if (w > h && w > MAX) { h *= MAX/w; w = MAX; }
-                else if (h > MAX) { w *= MAX/h; h = MAX; }
+                if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; }
                 canvas.width = w; canvas.height = h;
                 canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                const compressedBase64 = canvas.toDataURL('image/png');
-                db.ref('config/logoUrl').set(compressedBase64).then(() => alert("Logo importé et enregistré !"));
+                const dataUrl = canvas.toDataURL('image/png');
+                db.ref('config/logoUrl').set(dataUrl).then(() => alert("Logo mis à jour !"));
             };
             img.src = e.target.result;
         };
@@ -445,7 +434,7 @@
         multiFiles = [];
     }
 
-    function openPhoto(id, k) { const t = tousLesChantiers[id]; const dataUrl = t.photos[k]; const fileName = `${t.titre.replace(/[^a-z0-9]/gi, '_')}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.jpg`; document.getElementById('fullPhoto').src = dataUrl; document.getElementById('dlLink').href = dataUrl; document.getElementById('dlLink').download = fileName; document.getElementById('photoOverlay').style.display='flex'; }
+    function openPhoto(id, k) { const t = tousLesChantiers[id]; const dataUrl = t.photos[k]; const fileName = `${t.titre.replace(/[^a-z0-req0-9]/gi, '_')}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.jpg`; document.getElementById('fullPhoto').src = dataUrl; document.getElementById('dlLink').href = dataUrl; document.getElementById('dlLink').download = fileName; document.getElementById('photoOverlay').style.display='flex'; }
     function move(id, direction) { const task = tousLesChantiers[id]; const sameDay = Object.values(tousLesChantiers).filter(t => t.day == task.day).sort((a,b) => (a.ord||0)-(b.ord||0)); const idx = sameDay.findIndex(t => t.id === id); const newIdx = idx + direction; if (newIdx >= 0 && newIdx < sameDay.length) { const swapTask = sameDay[newIdx]; const tempOrd = task.ord || 0; db.ref('chantiers/'+task.id).update({ ord: swapTask.ord || 0 }); db.ref('chantiers/'+swapTask.id).update({ ord: tempOrd }); } }
     function sendNotif(titre, msg) { fetch('https://ntfy.sh/Alerte_chantier', { method: 'POST', body: titre + "\n" + msg }); }
     function setStatus(id, s, t) { db.ref('chantiers/'+id).update({status:s}); if(s==='done') sendNotif("CHANTIER TERMINE", t); }
