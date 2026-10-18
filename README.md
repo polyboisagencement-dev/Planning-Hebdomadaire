@@ -1,9 +1,8 @@
-<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PolyBois Agencement V10.8</title>
+    <title>PolyBois Agencement V11.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -11,23 +10,23 @@
         :root { --p: #1e40af; --p-light: #eff6ff; --s: #10b981; --s-light: #ecfdf5; --d: #ef4444; --d-light: #fef2f2; --n: #4b5563; --n-light: #f3f4f6; --txt: #1f2937; --txt-light: #6b7280; --bg: #f3f4f6; --card-bg: #ffffff; --border: #e5e7eb; --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--txt); }
         header { background: #1e3a8a; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: white; padding: 25px 15px; border-radius: 16px; margin-bottom: 20px; text-align: center; }
-        .brand-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid white; background: white; margin-bottom: 10px; }
+        .brand-logo { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 3px solid white; background: white; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .brand-name { margin: 0; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; }
         .nav-ctn { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
         .btn-nav { padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
         .btn-nav.today { background: white; color: #1e3a8a; border: none; }
-        #adminArea { background: var(--card-bg); padding: 20px; border-radius: 16px; margin-bottom: 25px; border: 2px dashed var(--p); display: none; }
+        #adminArea { background: var(--card-bg); padding: 20px; border-radius: 16px; margin-bottom: 25px; border: 2px dashed var(--p); display: none; position: relative; z-index: 10; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 20px; }
         .col { background: #e5e7eb; border-radius: 16px; padding: 12px; min-height: 250px; }
         .day-h { text-align: center; font-weight: 800; color: #1e40af; padding: 12px; text-transform: uppercase; font-size: 0.9rem; border-bottom: 1px solid #d1d5db; margin-bottom: 10px; }
-        .card { background: var(--card-bg); padding: 18px; border-radius: 14px; margin-top: 12px; border-left: 5px solid #d1d5db; box-shadow: var(--shadow); position: relative; }
+        .card { background: var(--card-bg); padding: 18px; border-radius: 14px; margin-top: 12px; border-left: 5px solid #d1d5db; box-shadow: var(--shadow); position: relative; z-index: 1; }
         .card.done { border-left-color: var(--s); background: #f9fafb; opacity: 0.8; }
         .card.issue { border-left-color: var(--d); }
         .prenom { background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-block; text-transform: uppercase; }
         .title { font-weight: 800; font-size: 1.2rem; display: block; margin: 4px 0; }
         .adr { font-size: 0.85rem; color: var(--txt-light); margin-bottom: 10px; }
         .contact-btns { display: flex; gap: 8px; margin-bottom: 12px; }
-        .btn-c { flex: 1; text-decoration: none; text-align: center; padding: 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; color: white; text-transform: uppercase; }
+        .btn-c { flex: 1; text-decoration: none; text-align: center; padding: 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; color: white; text-transform: uppercase; cursor: pointer; }
         .waze { background: #33ccff; } .call { background: #ff9f43; }
         .footer-btns { display: flex; gap: 5px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 10px; flex-wrap: wrap; }
         .btn-f { flex: 1; min-width: 65px; padding: 10px 2px; border: none; border-radius: 8px; font-weight: 800; font-size: 0.6rem; cursor: pointer; text-transform: uppercase; }
@@ -42,18 +41,22 @@
         .btn-close { padding: 12px 20px; background: var(--d); color: white; border: none; border-radius: 10px; font-weight: 800; font-size: 0.8rem; }
         .badge-note { background: #fefce8; border: 1px solid #fef08a; padding: 8px; border-radius: 8px; margin-top: 8px; font-size: 0.75rem; color: #854d0e; }
         .badge-time { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 8px; border-radius: 8px; margin-top: 8px; font-size: 0.75rem; color: #166534; }
-        input, select { padding: 12px; border: 1px solid var(--border); border-radius: 10px; width: 100%; margin-bottom: 10px; font-size: 0.9rem; }
+        input, select { padding: 12px; border: 1px solid var(--border); border-radius: 10px; width: 100%; margin-bottom: 10px; font-size: 0.9rem; box-sizing: border-box; }
         #fileList { text-align: left; margin: 10px 0; font-size: 0.75rem; }
         .file-item { background: #fff; padding: 5px 10px; border-radius: 5px; margin-bottom: 3px; display: flex; justify-content: space-between; border: 1px solid #eee; }
         
-        /* Zone cases à cocher */
+        /* Zone cases à cocher avec suppression */
         .prenoms-ctn { background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 10px; }
         .prenoms-title { font-size: 0.75rem; font-weight: 800; color: var(--txt-light); margin-bottom: 8px; text-transform: uppercase; }
         .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-        .checkbox-item { background: #f3f4f6; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+        .checkbox-item { background: #f3f4f6; padding: 6px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .checkbox-item input { width: auto; margin: 0; cursor: pointer; }
+        .btn-del-item { color: var(--d); font-weight: 900; margin-left: 4px; padding: 0 4px; border-radius: 50%; cursor: pointer; line-height: 1; font-size: 0.85rem; }
+        .btn-del-item:hover { background: #fee2e2; }
         .tel-inputs-flex { display: flex; gap: 8px; }
         .tel-inputs-flex input { flex: 1; margin-bottom: 0; }
+        .btn-del-task { margin-top:10px; color:var(--d); border:none; background:none; font-size:0.7rem; font-weight:800; cursor:pointer; width:100%; text-align:right; text-transform:uppercase; padding:5px 0; }
+        .btn-del-task:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -69,7 +72,7 @@
 <div id="docOverlay" class="overlay"><iframe id="fullDoc" style="width:95%; height:80vh; background:white; border-radius:12px;"></iframe><button onclick="closePopups()" class="btn-close" style="margin-top:10px;">FERMER</button></div>
 
 <header>
-    <img src="https://via.placeholder.com/60" alt="Logo PolyBois" class="brand-logo">
+    <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=200&q=80" alt="Logo PolyBois Agencement" class="brand-logo">
     <h1 class="brand-name">PolyBois Agencement</h1>
     <div class="nav-ctn">
         <button onclick="changeWeek(-7)" class="btn-nav">◄ PRÉC.</button>
@@ -136,38 +139,47 @@
     function listenDatabaseAutoSuggest() {
         db.ref('base_donnees/prenoms').on('value', snap => {
             const data = snap.val() || {};
-            const list = Object.values(data);
+            const entries = Object.entries(data);
             
             const ctn = document.getElementById('prenomsCheckboxes');
             const selected = getSelectedPrenoms();
-            ctn.innerHTML = list.map(p => {
-                const isChecked = selected.includes(p.toUpperCase()) ? 'checked' : '';
-                return `<label class="checkbox-item"><input type="checkbox" value="${p}" ${isChecked}> ${p}</label>`;
+            ctn.innerHTML = entries.map(([key, p]) => {
+                const valStr = typeof p === 'object' ? p.val : p;
+                const isChecked = selected.includes(valStr.toUpperCase()) ? 'checked' : '';
+                return `<span class="checkbox-item"><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="${valStr}" ${isChecked}> ${valStr}</label><span class="btn-del-item" title="Supprimer" onclick="deleteFromDb('prenoms','${key}')">✖</span></span>`;
             }).join('');
 
-            document.getElementById('listPrenoms').innerHTML = list.map(val => `<option value="${val}">`).join('');
+            document.getElementById('listPrenoms').innerHTML = entries.map(([k, p]) => `<option value="${typeof p === 'object' ? p.val : p}">`).join('');
         });
+
         db.ref('base_donnees/adresses').on('value', snap => {
             const data = snap.val() || {};
             document.getElementById('listAdresses').innerHTML = Object.values(data).map(val => `<option value="${val}">`).join('');
         });
+
         db.ref('base_donnees/telephones').on('value', snap => {
             const data = snap.val() || {};
-            const list = Object.values(data);
+            const entries = Object.entries(data);
 
             const ctn = document.getElementById('telephonesCheckboxes');
             const selected = getSelectedTelephones();
-            ctn.innerHTML = list.map(t => {
-                const valStr = typeof t === 'object' ? `${t.num}${t.nom ? ' ('+t.nom+')' : ''}` : t;
+            ctn.innerHTML = entries.map(([key, t]) => {
+                const valStr = typeof t === 'object' ? (t.val || `${t.num}${t.nom ? ' ('+t.nom+')' : ''}`) : t;
                 const isChecked = selected.some(s => s.toLowerCase() === valStr.toLowerCase()) ? 'checked' : '';
-                return `<label class="checkbox-item"><input type="checkbox" value="${valStr}" ${isChecked}> ${valStr}</label>`;
+                return `<span class="checkbox-item"><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="${valStr}" ${isChecked}> ${valStr}</label><span class="btn-del-item" title="Supprimer" onclick="deleteFromDb('telephones','${key}')">✖</span></span>`;
             }).join('');
 
-            document.getElementById('listTelephones').innerHTML = list.map(t => {
-                const valStr = typeof t === 'object' ? t.num : t;
+            document.getElementById('listTelephones').innerHTML = entries.map(([k, t]) => {
+                const valStr = typeof t === 'object' ? (t.num || t.val) : t;
                 return `<option value="${valStr}">`;
             }).join('');
         });
+    }
+
+    function deleteFromDb(category, key) {
+        if (confirm("Supprimer définitivement cet élément de la liste pré-enregistrée ?")) {
+            db.ref(`base_donnees/${category}/${key}`).remove();
+        }
     }
 
     function getSelectedPrenoms() {
@@ -220,11 +232,11 @@
         ref.once('value', snap => {
             const data = snap.val() || {};
             const exists = Object.values(data).some(v => {
-                const str = typeof v === 'object' ? `${v.num}${v.nom ? ' ('+v.nom+')' : ''}` : v;
+                const str = typeof v === 'object' ? (v.val || `${v.num}${v.nom ? ' ('+v.nom+')' : ''}`) : v;
                 return str.toLowerCase() === cleanVal.toLowerCase();
             });
             if (!exists) {
-                ref.push(cleanVal);
+                ref.push({ val: cleanVal });
             }
         });
     }
@@ -306,7 +318,7 @@
                     <button class="btn-f admin-btn" onclick="triggerUpload('${t.id}', 'doc')">📂 DOC</button>
                     ${isAdmin ? `<button class="btn-f admin-btn" onclick="startEdit('${t.id}')">EDIT</button>` : ''}
                 </div>
-                ${isAdmin ? `<button onclick="delT('${t.id}')" style="margin-top:8px; color:var(--d); border:none; background:none; font-size:0.65rem; cursor:pointer; width:100%; text-align:right;">SUPPRIMER</button>` : ''}`;
+                ${isAdmin ? `<button class="btn-del-task" onclick="delT('${t.id}')">SUPPRIMER LE CHANTIER</button>` : ''}`;
             list.appendChild(card);
         });
     }
@@ -383,7 +395,7 @@
     function triggerUpload(id, type) { activeId = id; document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click(); }
     function startEdit(id) { const t = tousLesChantiers[id]; document.getElementById('editId').value = id; setSelectedPrenoms(t.prenom || ""); setSelectedTelephones(t.tel || ""); document.getElementById('fTitre').value = t.titre || ""; document.getElementById('fAdr').value = t.adr || ""; document.getElementById('fCom').value = t.com || ""; document.getElementById('fDay').value = t.day; document.getElementById('formTitle').innerText = "MODIFIER LE CHANTIER"; document.getElementById('btnSubmit').innerText = "METTRE À JOUR"; document.getElementById('btnCancel').style.display = "block"; document.getElementById('fileZone').style.display = "none"; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function uploadFile(mode) { const file = document.getElementById(mode === 'img' ? 'photoInput' : 'fileInput').files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { if(mode === 'img') { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 1200; let w = img.width, h = img.height; if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0,0,w,h); db.ref('chantiers/'+activeId+'/photos').push(canvas.toDataURL('image/jpeg', 0.8)); }; img.src = e.target.result; } else { db.ref('chantiers/'+activeId+'/files').push({name:file.name, data:e.target.result}); } }; reader.readAsDataURL(file); }
-    function delT(id) { if(confirm("Supprimer ?")) db.ref('chantiers/'+id).remove(); }
+    function delT(id) { if(confirm("Voulez-vous vraiment supprimer ce chantier ?")) db.ref('chantiers/'+id).remove(); }
     
     listenDatabaseAutoSuggest();
     updateCalendar();
