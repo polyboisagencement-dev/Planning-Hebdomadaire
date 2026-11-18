@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PolyBois Agencement V11.4</title>
+    <title>PolyBois Agencement V11.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
-        :root { --p: #1e40af; --p-light: #eff6ff; --s: #10b981; --s-light: #ecfdf5; --d: #ef4444; --d-light: #fef2f2; --n: #4b5563; --n-light: #f3f4f6; --txt: #1f2937; --txt-light: #6b7280; --bg: #f3f4f6; --card-bg: #ffffff; --border: #e5e7eb; --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        :root { --p: #1e40af; --p-light: #eff6ff; --s: #10b981; --s-light: #ecfdf5; --d: #ef4444; --d-light: #fef2f2; --w: #f59e0b; --w-light: #fffbeb; --n: #4b5563; --n-light: #f3f4f6; --txt: #1f2937; --txt-light: #6b7280; --bg: #f3f4f6; --card-bg: #ffffff; --border: #e5e7eb; --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--txt); }
         header { background: #1e3a8a; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: white; padding: 25px 15px; border-radius: 16px; margin-bottom: 20px; text-align: center; }
         .brand-logo { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 3px solid white; background: white; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
@@ -21,8 +21,10 @@
         .col { background: #e5e7eb; border-radius: 16px; padding: 12px; min-height: 250px; }
         .day-h { text-align: center; font-weight: 800; color: #1e40af; padding: 12px; text-transform: uppercase; font-size: 0.9rem; border-bottom: 1px solid #d1d5db; margin-bottom: 10px; }
         .card { background: var(--card-bg); padding: 18px; border-radius: 14px; margin-top: 12px; border-left: 5px solid #d1d5db; box-shadow: var(--shadow); position: relative; z-index: 1; }
+        .card.priority { border-left: 6px solid var(--w); background: var(--w-light); }
         .card.done { border-left-color: var(--s); background: #f9fafb; opacity: 0.8; }
-        .card.issue { border-left-color: var(--d); }
+        .card.issue { border-left: 6px solid var(--d); }
+        .badge-prio { background: var(--w); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 900; display: inline-block; text-transform: uppercase; margin-right: 6px; letter-spacing: 0.5px; }
         .prenom { background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-block; text-transform: uppercase; }
         .title { font-weight: 800; font-size: 1.2rem; display: block; margin: 4px 0; }
         .adr { font-size: 0.85rem; color: var(--txt-light); margin-bottom: 10px; }
@@ -32,6 +34,7 @@
         .footer-btns { display: flex; gap: 5px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 10px; flex-wrap: wrap; }
         .btn-f { flex: 1; min-width: 65px; padding: 10px 2px; border: none; border-radius: 8px; font-weight: 800; font-size: 0.6rem; cursor: pointer; text-transform: uppercase; }
         .ok { background: var(--s-light); color: var(--s); } .cam { background: var(--p-light); color: var(--p); } .pb { background: var(--d-light); color: var(--d); } .note { background: var(--n-light); color: var(--n); } .admin-btn { background: #eee; color: #333; }
+        .btn-prio-active { background: #fef3c7; color: #b45309; border: 1px solid var(--w); }
         .btn-start { background: #e0f2fe; color: #0284c7; } .btn-end { background: #fef3c7; color: #d97706; }
         .reorder-btns { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 4px; }
         .btn-re { background: white; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 12px; }
@@ -60,6 +63,9 @@
 
         /* Bloc modification Logo */
         .logo-admin-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 20px; }
+        /* Case Prioritaire dans le formulaire */
+        .prio-check-box { background: var(--w-light); border: 2px solid var(--w); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 800; color: #b45309; font-size: 0.9rem; user-select: none; }
+        .prio-check-box input { width: 18px; height: 18px; margin: 0; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -128,6 +134,10 @@
     <select id="fDay">
         <option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option>
     </select>
+
+    <label class="prio-check-box">
+        <input type="checkbox" id="fPriority"> ⚡ CHANTIER PRIORITAIRE (S'affiche en haut en Jaune Or)
+    </label>
 
     <div id="fileZone" style="background:#f9fafb; padding:10px; border-radius:12px; margin-bottom:10px; border:1px dashed #ccc; text-align:center;">
         <label style="cursor:pointer; font-size:0.8rem; font-weight:800; color:var(--p);">📄 AJOUTER DES DOCUMENTS <input type="file" id="fDocInit" style="display:none" multiple onchange="handleFiles(this.files)"></label>
@@ -330,7 +340,12 @@
 
     function render(tasks) {
         document.querySelectorAll('.list').forEach(l => l.innerHTML = "");
-        const sorted = tasks.sort((a,b) => (a.ord||0)-(b.ord||0));
+        const sorted = tasks.sort((a,b) => {
+            const prioA = a.priority ? 1 : 0;
+            const prioB = b.priority ? 1 : 0;
+            if (prioA !== prioB) return prioB - prioA;
+            return (a.ord||0) - (b.ord||0);
+        });
         sorted.forEach((t) => {
             const list = document.getElementById('list-' + t.day);
             if(!list) return;
@@ -351,9 +366,9 @@
             const cleanCallTel = rawTel.replace(/\([^)]*\)/g, '').trim();
 
             const card = document.createElement('div');
-            card.className = `card ${t.status}`;
+            card.className = `card ${t.priority ? 'priority' : ''} ${t.status}`;
             card.innerHTML = `<div class="reorder-btns"><button class="btn-re" onclick="move('${t.id}', -1)">▲</button><button class="btn-re" onclick="move('${t.id}', 1)">▼</button></div>
-                <span class="prenom">${t.prenom}</span><span class="title">${t.titre}</span><div class="adr">📍 ${t.adr}</div>
+                ${t.priority ? `<span class="badge-prio">⚡ PRIORITAIRE</span>` : ''}<span class="prenom">${t.prenom}</span><span class="title">${t.titre}</span><div class="adr">📍 ${t.adr}</div>
                 ${t.tel ? `<div style="font-size:0.8rem; font-weight:700; color:var(--txt-light); margin-bottom:8px;">📞 ${t.tel}</div>` : ''}
                 <div class="contact-btns"><a href="waze://?q=${encodeURIComponent(t.adr)}&navigate=yes" class="btn-c waze">GPS</a><a href="tel:${cleanCallTel}" class="btn-c call">APPEL</a></div>
                 ${t.com ? `<div style="font-size:0.75rem; background:#f3f4f6; padding:8px; border-radius:8px;"><strong>Note Admin:</strong> ${t.com}</div>` : ''}
@@ -367,11 +382,16 @@
                     <button class="btn-f note" onclick="addNote('${t.id}', '${t.titre}')">NOTE</button>
                     <button class="btn-f pb" onclick="addPb('${t.id}', '${t.titre}')">PB</button>
                     <button class="btn-f admin-btn" onclick="triggerUpload('${t.id}', 'doc')">📂 DOC</button>
+                    ${isAdmin ? `<button class="btn-f ${t.priority ? 'btn-prio-active' : 'admin-btn'}" onclick="togglePriority('${t.id}', ${!!t.priority})" title="Basculer priorité">⚡</button>` : ''}
                     ${isAdmin ? `<button class="btn-f admin-btn" onclick="startEdit('${t.id}')">EDIT</button>` : ''}
                 </div>
                 ${isAdmin ? `<button class="btn-del-task" onclick="delT('${t.id}')">SUPPRIMER LE CHANTIER</button>` : ''}`;
             list.appendChild(card);
         });
+    }
+
+    function togglePriority(id, currentPrio) {
+        db.ref('chantiers/' + id).update({ priority: !currentPrio });
     }
 
     function setChantierTime(id, type, titre) {
@@ -398,6 +418,7 @@
         const telVal = selectedTelephones.join(', ');
 
         const adrVal = document.getElementById('fAdr').value;
+        const prioVal = document.getElementById('fPriority').checked;
 
         selectedPrenoms.forEach(p => saveToDatabase('prenoms', p));
         selectedTelephones.forEach(t => saveToDatabase('telephones', t));
@@ -407,6 +428,7 @@
             prenom: prenomVal, titre: document.getElementById('fTitre').value, 
             adr: adrVal, tel: telVal, 
             com: document.getElementById('fCom').value, day: document.getElementById('fDay').value,
+            priority: prioVal,
             weekID: getWeekID(currentMonday)
         };
         if(id) { db.ref('chantiers/'+id).update(data).then(() => resetForm()); } 
@@ -425,6 +447,7 @@
     function resetForm() {
         document.getElementById('editId').value = "";
         ["fTitre","fAdr","fCom","fPrenomExtra","fTelExtra","fTelNameExtra"].forEach(i => document.getElementById(i).value="");
+        document.getElementById('fPriority').checked = false;
         setSelectedPrenoms("");
         setSelectedTelephones("");
         document.getElementById('formTitle').innerText = "AJOUTER UN CHANTIER";
@@ -436,7 +459,7 @@
     }
 
     function openPhoto(id, k) { const t = tousLesChantiers[id]; const dataUrl = t.photos[k]; const fileName = `${t.titre.replace(/[^a-z0-req0-9]/gi, '_')}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.jpg`; document.getElementById('fullPhoto').src = dataUrl; document.getElementById('dlLink').href = dataUrl; document.getElementById('dlLink').download = fileName; document.getElementById('photoOverlay').style.display='flex'; }
-    function move(id, direction) { const task = tousLesChantiers[id]; const sameDay = Object.values(tousLesChantiers).filter(t => t.day == task.day).sort((a,b) => (a.ord||0)-(b.ord||0)); const idx = sameDay.findIndex(t => t.id === id); const newIdx = idx + direction; if (newIdx >= 0 && newIdx < sameDay.length) { const swapTask = sameDay[newIdx]; const tempOrd = task.ord || 0; db.ref('chantiers/'+task.id).update({ ord: swapTask.ord || 0 }); db.ref('chantiers/'+swapTask.id).update({ ord: tempOrd }); } }
+    function move(id, direction) { const task = tousLesChantiers[id]; const sameDay = Object.values(tousLesChantiers).filter(t => t.day == task.day).sort((a,b) => { const pA = a.priority?1:0, pB = b.priority?1:0; if(pA!==pB) return pB-pA; return (a.ord||0)-(b.ord||0); }); const idx = sameDay.findIndex(t => t.id === id); const newIdx = idx + direction; if (newIdx >= 0 && newIdx < sameDay.length) { const swapTask = sameDay[newIdx]; const tempOrd = task.ord || 0; db.ref('chantiers/'+task.id).update({ ord: swapTask.ord || 0 }); db.ref('chantiers/'+swapTask.id).update({ ord: tempOrd }); } }
     function sendNotif(titre, msg) { fetch('https://ntfy.sh/Alerte_chantier', { method: 'POST', body: titre + "\n" + msg }); }
     function setStatus(id, s, t) { db.ref('chantiers/'+id).update({status:s}); if(s==='done') sendNotif("CHANTIER TERMINE", t); }
     function addPb(id, t) { let m = prompt("Problème ?"); if(m) { let time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}); db.ref('chantiers/'+id+'/reports').push(time + " : " + m); db.ref('chantiers/'+id).update({status:'issue'}); sendNotif("ALERTE PB - " + t, m); } }
@@ -444,7 +467,7 @@
     function openDoc(id, k) { let f = tousLesChantiers[id].files[k]; document.getElementById('fullDoc').src = f.data; document.getElementById('docOverlay').style.display='flex'; }
     function closePopups() { document.querySelectorAll('.overlay').forEach(o => o.style.display='none'); document.getElementById('fullDoc').src=""; }
     function triggerUpload(id, type) { activeId = id; document.getElementById(type === 'img' ? 'photoInput' : 'fileInput').click(); }
-    function startEdit(id) { const t = tousLesChantiers[id]; document.getElementById('editId').value = id; setSelectedPrenoms(t.prenom || ""); setSelectedTelephones(t.tel || ""); document.getElementById('fTitre').value = t.titre || ""; document.getElementById('fAdr').value = t.adr || ""; document.getElementById('fCom').value = t.com || ""; document.getElementById('fDay').value = t.day; document.getElementById('formTitle').innerText = "MODIFIER LE CHANTIER"; document.getElementById('btnSubmit').innerText = "METTRE À JOUR"; document.getElementById('btnCancel').style.display = "block"; document.getElementById('fileZone').style.display = "none"; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function startEdit(id) { const t = tousLesChantiers[id]; document.getElementById('editId').value = id; setSelectedPrenoms(t.prenom || ""); setSelectedTelephones(t.tel || ""); document.getElementById('fTitre').value = t.titre || ""; document.getElementById('fAdr').value = t.adr || ""; document.getElementById('fCom').value = t.com || ""; document.getElementById('fDay').value = t.day; document.getElementById('fPriority').checked = !!t.priority; document.getElementById('formTitle').innerText = "MODIFIER LE CHANTIER"; document.getElementById('btnSubmit').innerText = "METTRE À JOUR"; document.getElementById('btnCancel').style.display = "block"; document.getElementById('fileZone').style.display = "none"; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function uploadFile(mode) { const file = document.getElementById(mode === 'img' ? 'photoInput' : 'fileInput').files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { if(mode === 'img') { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 1200; let w = img.width, h = img.height; if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0,0,w,h); db.ref('chantiers/'+activeId+'/photos').push(canvas.toDataURL('image/jpeg', 0.8)); }; img.src = e.target.result; } else { db.ref('chantiers/'+activeId+'/files').push({name:file.name, data:e.target.result}); } }; reader.readAsDataURL(file); }
     function delT(id) { if(confirm("Voulez-vous vraiment supprimer ce chantier ?")) db.ref('chantiers/'+id).remove(); }
     
