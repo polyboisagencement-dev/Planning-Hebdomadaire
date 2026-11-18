@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PolyBois Agencement V11.2</title>
+    <title>PolyBois Agencement V11.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -146,7 +147,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    let currentMonday = getMonday(new Date()), activeId = null, isAdmin = new URLSearchParams(window.location.search).get('admin') === '1', multiFiles = [], tousLesChantiers = {};
+    let currentMonday = getMonday(new Date()), activeId = null, isAdmin = window.location.href.includes('admin=1'), multiFiles = [], tousLesChantiers = {};
 
     if (isAdmin) document.getElementById('adminArea').style.display = 'block';
 
